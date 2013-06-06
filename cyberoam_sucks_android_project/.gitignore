@@ -1,9 +1,0 @@
-*.classpath
-*.project
-*.cproject
-*.settings
-*/bin
-*/gen
-*project.properties
-*/libs
-*/obj
