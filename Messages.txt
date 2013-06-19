@@ -1,0 +1,6 @@
+Failed to login: The system could not log you on.Make sure your password is correct
+Logout:You have successfully logged off 
+Login:You have successfully logged out
+
+
+Special Note : All of them are without a full stop.
