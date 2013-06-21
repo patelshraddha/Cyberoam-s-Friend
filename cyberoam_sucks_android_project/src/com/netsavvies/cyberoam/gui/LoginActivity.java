@@ -107,8 +107,8 @@ public class LoginActivity extends Activity {
 			*/
 			 final SharedPreferences settings = getSharedPreferences("user_details", 0);
 			 SharedPreferences.Editor editor = settings.edit();
-		      editor.putString("user1","201101124");
-		      editor.putString("password1","shrap17121993");
+		      editor.putString("user1","200901031");
+		      editor.putString("password1","divya");
 		      // Commit the edits!
 		      editor.commit();
 		}
