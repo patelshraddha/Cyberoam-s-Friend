@@ -1,49 +1,24 @@
 package com.netsavvies.cyberoam.gui;
 
 import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-import com.netsavvies.cyberoam.R;
-import com.netsavvies.cyberoam.backend.Control;
-import com.netsavvies.cyberoam.backend.CybService;
-
-import android.net.Uri;
-import android.net.wifi.WifiManager;
-import android.os.Bundle;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import com.netsavvies.cyberoam.R;
 
 public class LoginActivity extends Activity {
 
@@ -63,15 +38,15 @@ public class LoginActivity extends Activity {
 
 		int percentage = 0;
 
-		WifiManager mywifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-		int rssi = mywifiManager.getConnectionInfo().getRssi();
-		percentage = WifiManager.calculateSignalLevel(rssi, 100);
+	//	WifiManager mywifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+	//	int rssi = mywifiManager.getConnectionInfo().getRssi();
+  //		percentage = WifiManager.calculateSignalLevel(rssi, 100);
 
 		display.setText("" + percentage);
 
-		reg = new BroadcastReceiver() {
+		//reg = new BroadcastReceiver() {
 
-			@Override
+		/*	@Override
 			public void onReceive(Context arg0, Intent intent) {
 				// TODO Auto-generated method stub
 				if (intent.getAction().equals(WifiManager.RSSI_CHANGED_ACTION)) {
@@ -100,11 +75,12 @@ public class LoginActivity extends Activity {
 				}
 			}
 		};
-
+         	
 		registerReceiver(reg, new IntentFilter(WifiManager.RSSI_CHANGED_ACTION));
          
 		
 		
+	     
 		
 	/*	if(Control.isServiceRunning(this)==false)
 		{
@@ -116,6 +92,25 @@ public class LoginActivity extends Activity {
 		}
 		else
 			Toast.makeText(this,"Service already running",Toast.LENGTH_SHORT).show();*/
+	/*	HttpURLConnection urlc;
+		    
+			try {
+	             urlc= (HttpURLConnection) (new URL("http://10.100.56.55:8090/httpclient.html").openConnection());
+	            
+	            urlc.connect();
+	            display.setText("Connected   code is to be 200"+urlc.getResponseCode());
+	        } catch (IOException e) {
+	            Log.e("Problem", "Error checking internet connection", e);
+	           // display.setText("Connected"+urlc.getResponseCode());
+	        }
+			
+			*/
+			 final SharedPreferences settings = getSharedPreferences("user_details", 0);
+			 SharedPreferences.Editor editor = settings.edit();
+		      editor.putString("user1","201101124");
+		      editor.putString("password1","shrap17121993");
+		      // Commit the edits!
+		      editor.commit();
 		}
 
 	@Override
@@ -129,7 +124,7 @@ public class LoginActivity extends Activity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		//registerReceiver(reg, new IntentFilter(WifiManager.RSSI_CHANGED_ACTION));
+	//	registerReceiver(reg, new IntentFilter(WifiManager.RSSI_CHANGED_ACTION));
 	}
 
 	@Override

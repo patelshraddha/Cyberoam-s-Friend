@@ -11,14 +11,14 @@ import android.widget.Toast;
 
 public class InformGui {
 	
-	private static String loginmessage="You are logged in";
+	private static String loginmessage="You are logged in by id  ";
 	private static String logoutmessage="You are logged out";
-	private static String loginfailed="Login failed";
+	private static String loginfailed="Login failed due to maximum login limit or due to wrong password";
 	
 
-	public static void loggedIn(Context context)
+	public static void loggedIn(Context context,String id)
 	{
-		Toast logintoast=Toast.makeText(context,loginmessage,Toast.LENGTH_LONG);
+		Toast logintoast=Toast.makeText(context,loginmessage+id,Toast.LENGTH_LONG);
 		logintoast.setGravity(Gravity.CENTER_HORIZONTAL,0,0);
 		logintoast.show();
 	}

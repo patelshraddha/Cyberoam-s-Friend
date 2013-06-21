@@ -5,15 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-public class ServiceReceiver extends BroadcastReceiver {
+public class ReceiversForCybService extends BroadcastReceiver {
     
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
-		Intent startServiceIntent = new Intent(context, CybService.class);
-        context.startService(startServiceIntent);
-        Toast.makeText(context,"Service started",Toast.LENGTH_SHORT).show();
+		Control.startService(context,intent.getAction());
+		
 	}
 
 	
