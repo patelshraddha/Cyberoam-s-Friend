@@ -44,8 +44,8 @@ import android.widget.Toast;
 public class CybService extends Service {
 
 	int connection;
-    int loggedin;
-    String loginid=null;
+    
+    
 	@Override
 	public IBinder onBind(Intent arg0) {
 		// TODO Auto-generated method stub
@@ -56,37 +56,38 @@ public class CybService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO Auto-generated method stub
 		String action = intent.getStringExtra("action");
-        loggedin=0;
+        Static.loggedin=0;
+        Static.loginId=null;
      // Build notification
      // Actions are just fake
      
 		// Stop the activity if rebooted.
 		if (action == "android.intent.action.BOOT_COMPLETED")
-			Static.Notify("Boot completed",getApplicationContext());
+			InformGui.Notify("Boot completed",getApplicationContext());
 
 		connection = Static.getConnectivityStatus(getApplicationContext());
 		if (connection == 0)
-			Static.Notify("No data connection available",getApplicationContext());
+			InformGui.Notify("No data connection available",getApplicationContext());
 		else if (connection == 2)
 		{
-			Static.Notify("Using Data connection",getApplicationContext());
+			InformGui.Notify("Using Data connection",getApplicationContext());
 			Toast.makeText(getApplicationContext(),"Using Data connection",Toast.LENGTH_SHORT).show();// mobile connection
 		}
 			else {
 			if (Static.isCyberoamAvailbale() == true) {
-				if(loginCyberoam()==true)
+				if(attemptLogin()==true)
 				{
-					Static.Notify("Logged in by "+loginid,getApplicationContext());
-					InformGui.loggedIn(getApplicationContext(),loginid);
+					InformGui.Notify("Logged in by "+Static.loginId,getApplicationContext());
+					InformGui.loggedIn(getApplicationContext(),Static.loginId);
 				}
 				else
 				{
-					Static.Notify("Logged failed",getApplicationContext());
+					InformGui.Notify("Logged failed",getApplicationContext());
 					InformGui.loginFailed(getApplicationContext());
 				}	
 			} else {
 				// using some other wifi or because the wifi strength is less
-				Static.Notify("Cyberoam can't be reached",getApplicationContext());
+				InformGui.Notify("Cyberoam can't be reached",getApplicationContext());
 			}
 		}
 
@@ -94,34 +95,34 @@ public class CybService extends Service {
 
 	}
 
-	public boolean loginCyberoam()
+	public boolean attemptLogin()
 	{
 		int i=1;
 		String message;
 		while(getloginId(i)!=null)
 		{
-		message=action("191",getloginId(i),getloginPassword(i),getApplicationContext());
+		message=contactServer("191",getloginId(i),getloginPassword(i),getApplicationContext());
 	    if(message.equals("You have successfully logged in")||message.equals("You are logged in as a clientless user"))
 	    {
-	    loggedin=1;
-	    loginid=getloginId(i);
+	    Static.loggedin=1;
+	    Static.loginId=getloginId(i);
 	    break;
 	    }
 	    i++;
 		}
-		if(loggedin==1)
+		if(Static.loggedin==1)
 			return true;
 		else
 			return false;
 			
    }
 
-	public void logoutCyberoam(Context context, String loginid,
+	public void attemptLogout(Context context, String loginid,
 			String loginpassword) {
-		action("193", loginid, loginpassword, context);
+		contactServer("193", loginid, loginpassword, context);
 	}
 
-	private String action(String loginmode, String loginid, String loginpassword,
+	private String contactServer(String loginmode, String loginid, String loginpassword,
 			Context context) {
 		String url = "http://10.100.56.55:8090/httpclient.html";
 		String message="empty";

@@ -36,7 +36,8 @@ class Static {
 									// Have to give a thought on its value
 
 	// user data
-	static String userId;
+	static String loginId;
+	static int loggedin;
 	static String password;
 
 	// bools
@@ -79,32 +80,6 @@ class Static {
 		}
 	}
 
-	public static void Notify(String subject, Context context) {
-
-		Intent intent = new Intent(context, LoginActivity.class);
-		PendingIntent pIntent = PendingIntent
-				.getActivity(context, 0, intent, 0);
-		
-		//Bitmap largeIcon = BitmapFactory.decodeResource(context.getResources(),R.drawable.large);
-
-		Notification noti = new NotificationCompat.Builder(context)
-				.setContentTitle("Internet Connection Status")
-				.setContentText(subject)
-		       // .setLargeIcon(largeIcon)
-				.setWhen(0)
-				.setSmallIcon(R.drawable.ic_launcher)
-				.setContentIntent(pIntent).build();
-
-		NotificationManager notificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-
-		// Do not Hide the notification after its selected
-		noti.flags |= Notification.FLAG_NO_CLEAR;
-		// Let the notification be ongoing
-		noti.flags |= Notification.FLAG_ONGOING_EVENT;
-		// Let the notification be ongoing
-		noti.flags |= Notification.FLAG_FOREGROUND_SERVICE;
-		notificationManager.notify(0, noti);
-	}
+	
 
 }

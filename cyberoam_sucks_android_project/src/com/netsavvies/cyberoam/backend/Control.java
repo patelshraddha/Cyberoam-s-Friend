@@ -52,6 +52,7 @@ public class Control {
 	}
 	
 	
+	
 	public static boolean isServiceRunning(Context context) {
 	    ActivityManager manager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
 	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
