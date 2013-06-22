@@ -43,12 +43,14 @@ public class Control {
 
 	public static void startService(Context context,String action)
 	{
+		int connection = Static.getConnectivityStatus(context);
 		
-		
+		if(!((Static.isloggedIn)&&(connection==1)))
+		{
 		Intent newintent=new Intent(context,CybService.class);
 	    newintent.putExtra("action",action);
 	    context.startService(newintent);
-        
+		}
 	}
 	
 	

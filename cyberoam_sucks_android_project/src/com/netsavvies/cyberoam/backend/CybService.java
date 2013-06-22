@@ -9,6 +9,8 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -44,7 +46,8 @@ import android.widget.Toast;
 public class CybService extends Service {
 
 	int connection;
-    
+	TimerTask task;
+	Timer timer;
     
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -56,8 +59,22 @@ public class CybService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO Auto-generated method stub
 		String action = intent.getStringExtra("action");
-        Static.loggedin=0;
+        Static.isloggedIn=false;
         Static.loginId=null;
+        timer=new Timer();
+        task = new TimerTask() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				if(attemptLogin())
+				{
+					InformGui.Notify("Logged in by "+Static.loginId,getApplicationContext());
+					InformGui.loggedIn(getApplicationContext(),Static.loginId);
+				}
+			}
+            
+        };
      // Build notification
      // Actions are just fake
      
@@ -74,11 +91,12 @@ public class CybService extends Service {
 			Toast.makeText(getApplicationContext(),"Using Data connection",Toast.LENGTH_SHORT).show();// mobile connection
 		}
 			else {
-			if (Static.isCyberoamAvailbale() == true) {
-				if(attemptLogin()==true)
+			if (Static.isCyberoamAvailbale()) {
+				if(attemptLogin())
 				{
 					InformGui.Notify("Logged in by "+Static.loginId,getApplicationContext());
 					InformGui.loggedIn(getApplicationContext(),Static.loginId);
+					timer.schedule(task,Static.loginInterval,Static.loginInterval);
 				}
 				else
 				{
@@ -104,13 +122,13 @@ public class CybService extends Service {
 		message=contactServer("191",getloginId(i),getloginPassword(i),getApplicationContext());
 	    if(message.equals("You have successfully logged in")||message.equals("You are logged in as a clientless user"))
 	    {
-	    Static.loggedin=1;
+	    Static.isloggedIn=true;
 	    Static.loginId=getloginId(i);
 	    break;
 	    }
 	    i++;
 		}
-		if(Static.loggedin==1)
+		if(Static.isloggedIn==true)
 			return true;
 		else
 			return false;

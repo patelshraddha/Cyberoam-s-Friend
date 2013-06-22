@@ -26,7 +26,7 @@ import android.util.Log;
 
 class Static {
 	// Intervals
-	static int loginInterval; // if already loggend in, then automatically
+	static final int loginInterval=2*60*60; // if already loggend in, then automatically
 								// attempt to login again after this interval.
 								// Generally kept to be 2 -3 hrs
 	static int loginTrialInterval; // if a login attempt fails, then try to
@@ -37,7 +37,7 @@ class Static {
 
 	// user data
 	static String loginId;
-	static int loggedin;
+	static boolean isloggedIn;
 	static String password;
 
 	// bools

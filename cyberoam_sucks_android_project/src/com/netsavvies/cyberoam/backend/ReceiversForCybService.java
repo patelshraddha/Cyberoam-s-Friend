@@ -1,5 +1,7 @@
 package com.netsavvies.cyberoam.backend;
 
+import com.netsavvies.cyberoam.gui.InformGui;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -11,7 +13,9 @@ public class ReceiversForCybService extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
-		Control.startService(context,intent.getAction());
+		
+			Control.startService(context,intent.getAction());	
+		
 		
 	}
 
