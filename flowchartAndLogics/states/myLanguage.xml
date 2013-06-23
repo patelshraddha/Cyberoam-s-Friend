@@ -1,0 +1,36 @@
+<NotepadPlus>
+    <UserLang name="myLanguage" ext="cyb">
+        <Settings>
+            <Global caseIgnored="no" />
+            <TreatAsSymbol comment="yes" commentLine="no" />
+            <Prefix words1="no" words2="no" words3="no" words4="no" />
+        </Settings>
+        <KeywordLists>
+            <Keywords name="Delimiters">000000</Keywords>
+            <Keywords name="Folder+"></Keywords>
+            <Keywords name="Folder-"></Keywords>
+            <Keywords name="Operators">( ) , .</Keywords>
+            <Keywords name="Comment"> 1&quot; 2&quot; 0//</Keywords>
+            <Keywords name="Words1">WIFI NET STR L  C GTFO WIFI_C NET_C STR_C L_C  C_C GTFO_C WIFI_P NET_P STR_P L_P  C_P GTFO_P =&gt;</Keywords>
+            <Keywords name="Words2">WIFI+ L+ STR+ C+ NET+ {+ }+ GTFO+ ALL+ LA+ </Keywords>
+            <Keywords name="Words3">WIFI- L- STR- C- NET- {- }- GTFO- ALL- LA-</Keywords>
+            <Keywords name="Words4">setState if else timers notify do set try reg unreg findReason check switch find</Keywords>
+        </KeywordLists>
+        <Styles>
+            <WordsStyle name="DEFAULT" styleID="11" fgColor="000000" bgColor="FFFFFF" fontName="Segoe UI Light" fontStyle="0" />
+            <WordsStyle name="FOLDEROPEN" styleID="12" fgColor="000000" bgColor="FFFFFF" fontStyle="0" />
+            <WordsStyle name="FOLDERCLOSE" styleID="13" fgColor="000000" bgColor="FFFFFF" fontStyle="0" />
+            <WordsStyle name="KEYWORD1" styleID="5" fgColor="F9BB39" bgColor="FFFFFF" fontName="Segoe UI" fontStyle="1" />
+            <WordsStyle name="KEYWORD2" styleID="6" fgColor="00B700" bgColor="FFFFFF" fontName="Segoe UI" fontStyle="1" />
+            <WordsStyle name="KEYWORD3" styleID="7" fgColor="FF0000" bgColor="FFFFFF" fontName="Segoe UI" fontStyle="1" />
+            <WordsStyle name="KEYWORD4" styleID="8" fgColor="000000" bgColor="FFFFFF" fontName="Segoe UI" fontStyle="2" />
+            <WordsStyle name="COMMENT" styleID="1" fgColor="808080" bgColor="FFFFFF" fontName="Segoe UI Light" fontStyle="0" />
+            <WordsStyle name="COMMENT LINE" styleID="2" fgColor="808080" bgColor="FFFFFF" fontName="Segoe UI Light" fontStyle="0" />
+            <WordsStyle name="NUMBER" styleID="4" fgColor="800000" bgColor="FFFFFF" fontStyle="1" />
+            <WordsStyle name="OPERATOR" styleID="10" fgColor="000000" bgColor="FFFFFF" fontStyle="0" />
+            <WordsStyle name="DELIMINER1" styleID="14" fgColor="000000" bgColor="FFFFFF" fontStyle="0" />
+            <WordsStyle name="DELIMINER2" styleID="15" fgColor="000000" bgColor="FFFFFF" fontStyle="0" />
+            <WordsStyle name="DELIMINER3" styleID="16" fgColor="000000" bgColor="FFFFFF" fontStyle="0" />
+        </Styles>
+    </UserLang>
+</NotepadPlus>
