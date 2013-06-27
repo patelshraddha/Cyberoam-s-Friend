@@ -183,7 +183,11 @@ public class CybService extends Service {
 				}
 			}
 		});
-
+		
+		bcrExist_hs.put(Const.wifi,false);
+		bcrExist_hs.put(Const.wifiLocha,false);
+		bcrExist_hs.put(Const.str,false);
+		
 	}
 
 	private void set(Const key, Boolean bool) {
@@ -289,25 +293,27 @@ public class CybService extends Service {
 	private void receiver(Const key, boolean bool) {
 		switch (key) {
 		case wifi:
-			if (bool) {
+			if (bool && !bcrExist_hs.get(Const.wifi) ) {
 				registerReceiver(bcr_hs.get(Const.wifi), new IntentFilter( WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
+				bcrExist_hs.put(Const.wifi,true);				
 			} else if (bcrExist_hs.get(Const.wifi)) {
 				unregisterReceiver(bcr_hs.get(Const.wifi));
 			}
 			break;
 
 		case wifiLocha:
-			if (bool) {
+			if (bool && !bcrExist_hs.get(Const.wifiLocha)) {
 				registerReceiver(bcr_hs.get(Const.wifiLocha), new IntentFilter(	WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
+				bcrExist_hs.put(Const.wifiLocha,true);
 			} else if (bcrExist_hs.get(Const.wifiLocha)) {
 				unregisterReceiver(bcr_hs.get(Const.wifiLocha));
 			}
 			break;
 
 		case str:
-			if (bool) {
-				registerReceiver(bcr_hs.get(Const.str), new IntentFilter(
-						WifiManager.RSSI_CHANGED_ACTION));
+			if (bool && !bcrExist_hs.get(Const.str)) {
+				registerReceiver(bcr_hs.get(Const.str), new IntentFilter(WifiManager.RSSI_CHANGED_ACTION));
+				bcrExist_hs.put(Const.str,true);
 			} else if (bcrExist_hs.get(Const.str)){
 				unregisterReceiver(bcr_hs.get(Const.str));
 			}
