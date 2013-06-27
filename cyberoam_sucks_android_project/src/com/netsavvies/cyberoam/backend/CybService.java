@@ -209,7 +209,7 @@ public class CybService extends Service {
 	}
 
 	private boolean check(Const key) {
-
+		Log.d("check", key.name());
 		switch (key) {
 		case wifi:
 			return Methods.isWifiConnected(getApplicationContext());
@@ -227,6 +227,8 @@ public class CybService extends Service {
 	}
 
 	private void timer(Const key, boolean bool) {
+		Log.d("timer", key.name()+" "+bool);
+		
 		switch (key) {
 		case l:
 			if (bool) {
@@ -292,6 +294,8 @@ public class CybService extends Service {
 	}
 
 	private void receiver(Const key, boolean bool) {
+		Log.d("reciever", key.name()+" "+bool);
+		
 		switch (key) {
 		case wifi:
 			if (bool && !bcrExist_hs.get(Const.wifi) ) {
