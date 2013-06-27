@@ -38,9 +38,7 @@ public class LoginActivity extends Activity {
 
 		int percentage = 0;
 
-	//	WifiManager mywifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-	//	int rssi = mywifiManager.getConnectionInfo().getRssi();
-  //		percentage = WifiManager.calculateSignalLevel(rssi, 100);
+	
 
 		display.setText("" + percentage);
 
@@ -59,21 +57,7 @@ public class LoginActivity extends Activity {
 
 			}
 
-			int calculateSignalLevel(int rssi) {
-				// TODO Auto-generated method stub
-				int MIN_RSSI = -100;
-				int MAX_RSSI = -55;
-				int numLevels = 100;
-				if (rssi <= MIN_RSSI) {
-					return 0;
-				} else if (rssi >= MAX_RSSI) {
-					return numLevels-1;
-				} else {
-					float inputRange = (MAX_RSSI - MIN_RSSI);
-					float outputRange = (numLevels-1);
-					return (int) ((float) (rssi - MIN_RSSI) * outputRange / inputRange);
-				}
-			}
+			
 		};
          	
 		registerReceiver(reg, new IntentFilter(WifiManager.RSSI_CHANGED_ACTION));
@@ -92,19 +76,9 @@ public class LoginActivity extends Activity {
 		}
 		else
 			Toast.makeText(this,"Service already running",Toast.LENGTH_SHORT).show();*/
-	/*	HttpURLConnection urlc;
-		    
-			try {
-	             urlc= (HttpURLConnection) (new URL("http://10.100.56.55:8090/httpclient.html").openConnection());
-	            
-	            urlc.connect();
-	            display.setText("Connected   code is to be 200"+urlc.getResponseCode());
-	        } catch (IOException e) {
-	            Log.e("Problem", "Error checking internet connection", e);
-	           // display.setText("Connected"+urlc.getResponseCode());
-	        }
+	
 			
-			*/
+			
 			 final SharedPreferences settings = getSharedPreferences("user_details", 0);
 			 SharedPreferences.Editor editor = settings.edit();
 		      editor.putString("user1","200901031");

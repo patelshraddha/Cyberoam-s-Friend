@@ -8,26 +8,32 @@ switch
 	noCyb:
 		check(L_P)
 		{+
-			// loche pe locha.. sala bhaag k gaya
-			setVar(L-)
+			// loche pe locha.. sala bhaag k gayawifi
+			set(L-)
 		}+
 		{- 
 			
 		}-
 	lowSTR:
-		check(L_P)
+		check(L_P) = if(get(L))
 		{+
 			do(LA-)
-			setVar(L-)
+			set(L-)
 		}+
 		{-
 			do nothing
 		}-
-	notLoggedIn:
-		setVar(L-)
-		execute below
+	
 		
 	highSTR or cybCheck or reLogin or wifiConnected or noNet or notLoggedIn or start
+		if(command==notLoggedIn)
+		set(L-)
+		{
+		
+
+		
+		
+		
 		check(L_P && command != (reLogin))
 		{+
 			if(command == noNet)
@@ -38,12 +44,12 @@ switch
 		{-
 			try(LA+)
 			{+
-				setVar(L+)
+				set(L+)
 				timer(L+)
 				dispatch(TOP,netRecheck)
 			}+
 			{-
-				setVar(L-)
+				set(L-)
 				find(reason)  // reasons:  lowSTR, maxLogin,clientless,invalid usr pwd, no Id Pwd
 				switch(reason)
 				{
@@ -60,7 +66,7 @@ switch
 		// no need check(L_P)
 		// {+
 			try(LA-)
-			setVar(L-)
+			set(L-)
 		// }+
 		// {-
 			// aek aur locha
@@ -95,7 +101,7 @@ check(C_C)
 	check(C_P)
 	{+
 		dispatch(L,noCyb)
-		setVar(C-)
+		set(C-)
 	}+
 }-
 {+
@@ -104,18 +110,18 @@ check(C_C)
 	{+
 	}+
 	{-
-		setVar(C+)
+		set(C+)
 	}-
 	
 	switch(command)
 	{
 		wifiDisconnected or stop:
 			dispatch(L,wifiDisconnected)
-			setVar(C-)
+			set(C-)
 		
 		wifiKaLochaTheekKaro:
 			dispatch(L,wifiKaLochaTheekKaro)
-			setVar(C-)
+			set(C-)
 		
 		lowSTR:
 			dispatch(L,lowSTR)
@@ -143,11 +149,11 @@ switch(command)
 		receiver(STR+)
 		check(STR_C)
 		{+
-			setVar(STR+)
+			set(STR+)
 			dispatch(C,command)
 		}+
 		{-
-			// no need to setVar(STR-) as already done ats start up
+			// no need to set(STR-) as already done ats start up
 		}-
 		return
 		
@@ -157,26 +163,13 @@ switch(command)
 		return
 		
 	strChange:
-		check(STR_C)
+		check(STR_P)
 		{+
-			check(STR_P)
-			{+
-			}+
-			{-
-				setVar(STR+)
-				dispatch(C,highSTR)
-			}-
+			dispatch(C,highSTR)
 		}+
 		{-
-			check(STR_P)
-			{+
-				setVar(STR-)
-				dispatch(C,lowSTR)
-			}+
-			{-
-			
-			}-
-		}-
+			dispatch(C,lowSTR)
+		{-
 		return
 		
 }
@@ -205,36 +198,36 @@ switch(command)
 {
 	wifiKaLochaTheekKaro:
 		// no need timer(NET-)
-		// no need setVar(NET-)
+		// no need set(NET-)
 		dispatch(STR,command)
 		
 	wifiDisconnected or wrongIdPwd or stop:
 		timer(NET-)
-		setVar(NET-)
-		dispatch(STR,command)
-	
+		set(NET-)
+
+		
 	strChange, reLogin, cybCheck:
 		dispatch(STR,command)
 	wifiConnected or start:
 		timer(NET+)
 		check(NET_C)
 		{+
-			setVar(NET+)
-			setVar(cyberLess+) // don't know how to how to use it further, if net disconnected
+			set(NET+)
+			set(cyberLess+) // don't know how to how to use it further, if net disconnected
 		}+
 		{-
-			// no needsetVar(NET-)
+			// no needset(NET-)
 			dispatch(STR,command)
 		}-
 	netCheck:
 		check(NET_C)
 		{+
-			setVar(NET+)
+			set(NET+)
 		}+
 		{-
 			switch(reason)
 			{	
-				setVar(NET-)
+				set(NET-)
 				cybPage:
 					dispatch(STR,notLoggedIn)
 				others: something terribly wrong
@@ -245,10 +238,10 @@ switch(command)
 	netRecheck:
 		check(NET_C)
 		{+
-			setVar(NET+)
+			set(NET+)
 		}+
 		{-
-			setVar(NET-)
+			set(NET-)
 			inform logged in but no net
 		}-
 }
@@ -294,13 +287,13 @@ dispatch(TOP,command)
 	stop or wrongIdPwd:
 		check(isStopped) 
 		{- 
-			setVar(isStopped+)
+			set(isStopped+)
 			dispatch(WIFI,command)
 		}-
 	start:
 		check(isStopped) 
 		{+
-			setVar(isStopped-)
+			set(isStopped-)
 			dispatch(WIFI,start)
 		}+
 	restart:
