@@ -489,7 +489,7 @@ public class CybService extends Service {
 				return;
 			}
 		} 
-		if(check(Const.str))
+		if(get(Const.str))
 		{
 			switch(command)
 			{
@@ -513,10 +513,9 @@ public class CybService extends Service {
 					set(Const.c, true);
 				
 				switch (command) {
-				case wifiDisconnected:
 				case stop:
 					set(Const.c, false);
-					dispatch(Const.l, Const.wifiDisconnected);
+					dispatch(Const.l,command);
 					break;
 				case wifiKaLochaTheekKaro:
 					dispatch(Const.l, Const.wifiKaLochaTheekKaro);
@@ -531,6 +530,13 @@ public class CybService extends Service {
 			} else {
 				
 				switch (command) {
+				case wifiDisconnected:
+				case stop:
+					set(Const.c, false);
+					timer(Const.c, false);
+					dispatch(Const.l,command);
+					break;
+					
 				case noNet:
 				case cybCheck:
 				case wifiConnected:
@@ -572,8 +578,6 @@ public class CybService extends Service {
 				if (get(Const.l)) {
 					attemptLogout(getApplicationContext(),Vars.loginId,Vars.password);
 					set(Const.l, false);
-				} else {
-					timer(Const.l,false);
 				}
 				break;
 
@@ -778,7 +782,6 @@ public class CybService extends Service {
 		} catch (SAXException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-
 		}
 		return message;
 	}
@@ -788,14 +791,14 @@ public class CybService extends Service {
 				.getSharedPreferences("user_details", 0);
 		String user = settings.getString("user" + i, null);
 		return user;*/
-		return "201101124";
+		return "201001013";
 	}
 
 	private String getloginPassword(int i) {
 		SharedPreferences settings = getApplicationContext()
 				.getSharedPreferences("user_details", 0);
 		String password = settings.getString("password" + i, null);
-		return "shrap17121993";
+		return "sagardbest";
 	}
 
 }
