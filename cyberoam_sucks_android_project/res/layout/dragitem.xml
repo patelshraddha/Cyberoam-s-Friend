@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="100" >
+
+    <ImageView
+        android:id="@+id/ImageView01"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/icmpmove"
+        android:layout_weight="20" >
+    </ImageView>
+
+    <TextView
+        android:id="@+id/TextView01"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:text="@+id/TextView01"
+        android:textSize="36sp"
+        android:layout_weight="60" >
+    </TextView>
+
+    <CheckBox
+        android:id="@+id/checkBox"
+        android:layout_width="0dp"
+        android:layout_weight="20"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center" />
+
+</LinearLayout>
