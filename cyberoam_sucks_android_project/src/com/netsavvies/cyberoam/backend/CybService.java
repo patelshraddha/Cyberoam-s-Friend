@@ -486,7 +486,19 @@ public class CybService extends Service {
 				}
 				return;
 			}
-		} // STR over
+		} 
+		if(check(Const.str))
+		{
+			switch(command)
+			{
+			case cybCheck:
+			case reLogin:
+			case noNet:
+			case notLoggedIn:
+				dispatch(Const.c,command);
+			break;
+			}
+		}
 		break;
 		
 		case c: {
