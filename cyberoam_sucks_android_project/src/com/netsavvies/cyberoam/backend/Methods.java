@@ -43,7 +43,9 @@ class Methods {
 		return 0;
 	}
 
-	static boolean isCyberoamAvailbale() {
+	static boolean isCyberoamAvailbale(Context context) {
+		if (!isWifiConnected(context))
+			return false;
 		HttpURLConnection urlc;
 
 		try {
@@ -78,9 +80,8 @@ class Methods {
 	}
 
 	static int isConnectionAlive(Context context) {
-		// TODO Auto-generated method stub
-		/*if (!iswifiConnected(context))
-			return false;*/
+		if (!isWifiConnected(context))
+			return 0;
 		
 
 		String message = null;

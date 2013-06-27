@@ -214,7 +214,7 @@ public class CybService extends Service {
 		case wifi:
 			return Methods.isWifiConnected(getApplicationContext());
 		case c:
-			return Methods.isCyberoamAvailbale();
+			return Methods.isCyberoamAvailbale(getApplicationContext());
 		case l:
 			return get(key);
 		case str:
@@ -370,8 +370,8 @@ public class CybService extends Service {
 				dispatch(Const.net, command);
 				break;
 			case start:
+				receiver(Const.wifi,true);
 				if (check(Const.wifi)) {
-					receiver(Const.wifi,true);
 					dispatch(Const.net, command);
 				}
 				break;
