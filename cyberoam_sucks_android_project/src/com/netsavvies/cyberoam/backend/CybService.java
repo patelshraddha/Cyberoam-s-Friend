@@ -361,7 +361,6 @@ public class CybService extends Service {
 				if (!get(Const.isStopped)) {
 					dispatch(Const.wifi, command);
 				}
-
 				break;
 			}
 		
@@ -466,10 +465,13 @@ public class CybService extends Service {
 				return;
 			case wifiConnected:
 			case start:
-				receiver(Const.str, true);
 				if (check(Const.str)) {
 					set(Const.str, true);
+					receiver(Const.str, true);
 					dispatch(Const.c, command);
+				}
+				else {
+					receiver(Const.str, true);
 				}
 				return;
 			case wifiDisconnected:
@@ -491,12 +493,14 @@ public class CybService extends Service {
 		{
 			switch(command)
 			{
-			case cybCheck:
-			case reLogin:
-			case noNet:
-			case notLoggedIn:
-				dispatch(Const.c,command);
-			break;
+				case cybCheck:
+				case reLogin:
+				case noNet:
+				case notLoggedIn:
+					dispatch(Const.c,command);
+				break;
+				default:
+					// locha
 			}
 		}
 		break;
@@ -568,16 +572,18 @@ public class CybService extends Service {
 				if (get(Const.l)) {
 					attemptLogout(getApplicationContext(),Vars.loginId,Vars.password);
 					set(Const.l, false);
+				} else {
+					timer(Const.l,false);
 				}
 				break;
 
+			case notLoggedIn:
+				set(Const.l, false);
 			case highSTR:
 			case cybCheck:
 			case reLogin:
 			case wifiConnected:
 			case noNet:
-			case notLoggedIn:
-				set(Const.l, false);
 			case start: 
 				if ((get(Const.l)) && (command != Const.reLogin)) {
 					if (command == Const.noNet) {
