@@ -84,7 +84,7 @@ class Methods {
 			return 0;
 		
 
-		String message = null;
+		String message = "";
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpPost client = new HttpPost("http://playpowerlabs.org/");
 

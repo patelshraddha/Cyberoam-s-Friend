@@ -209,15 +209,18 @@ public class CybService extends Service {
 	}
 
 	private boolean check(Const key) {
-		Log.d("check", key.name());
+		
 		switch (key) {
 		case wifi:
+			Log.d("check", key.name()+" "+Methods.isWifiConnected(getApplicationContext()));
 			return Methods.isWifiConnected(getApplicationContext());
 		case c:
+			Log.d("check", key.name()+" "+Methods.isCyberoamAvailbale(getApplicationContext()));
 			return Methods.isCyberoamAvailbale(getApplicationContext());
 		case l:
 			return get(key);
 		case str:
+			Log.d("check", key.name()+" "+  Methods.isStrengthEnough(getApplicationContext()));
 			return Methods.isStrengthEnough(getApplicationContext());
 
 		default:
@@ -464,7 +467,7 @@ public class CybService extends Service {
 				return;
 			case wifiConnected:
 			case start:
-				receiver(Const.str, true);
+				//receiver(Const.str, true);
 				if (check(Const.str)) {
 					set(Const.str, true);
 					dispatch(Const.c, command);
