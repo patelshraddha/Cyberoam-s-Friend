@@ -42,6 +42,7 @@ import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.StrictMode;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -614,7 +615,10 @@ public class CybService extends Service {
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
-		// set Timers
+		
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+
+		StrictMode.setThreadPolicy(policy); 
 		init();
 		dispatch(Const.top,Const.start);
 		
