@@ -151,7 +151,8 @@ class Methods {
 		
 		WifiManager mywifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		int level = calculateSignalLevel((mywifiManager.getConnectionInfo().getRssi()));
-	    if(level>=Vars.thresholdStrength)
+		Log.d("WifiStrength",level+"");
+	    if(level >= Vars.thresholdStrength)
 	    	return true;
 	    else
 	    	return false;

@@ -172,15 +172,14 @@ public class CybService extends Service {
 						if(!get(Const.str)){
 							set(Const.str,true);
 							dispatch(Const.top,Const.strChange);
-						} else {
+						}
+					}
+					else {
 							if(get(Const.str)){
 								set(Const.str,false);
 								dispatch(Const.top,Const.strChange);
 							}
-						}
 					}
-					
-					
 				}
 			}
 		});
@@ -467,7 +466,7 @@ public class CybService extends Service {
 				return;
 			case wifiConnected:
 			case start:
-				//receiver(Const.str, true);
+				receiver(Const.str, true);
 				if (check(Const.str)) {
 					set(Const.str, true);
 					dispatch(Const.c, command);
@@ -691,6 +690,7 @@ public class CybService extends Service {
 		// while (getloginId(i) != null) {
 		message = contactServer("191", getloginId(i), getloginPassword(i),
 				getApplicationContext());
+		Log.d("loginMsg",message);
 		if (message.equals("You have successfully logged in")
 				|| message
 						.equals("You are already logged in as a clientless user")) {
