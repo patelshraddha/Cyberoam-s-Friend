@@ -286,16 +286,16 @@ dispatch(TOP,command)
 {
 	stop or wrongIdPwd:
 		check(isStopped) 
-		{- 
+		{-
 			set(isStopped+)
 			dispatch(WIFI,command)
 		}-
 	start:
 		check(isStopped) 
-		{+
+		{-
 			set(isStopped-)
 			dispatch(WIFI,start)
-		}+
+		}-
 	restart:
 		dispatch(TOP,stop)
 		dispatch(TOP,start)

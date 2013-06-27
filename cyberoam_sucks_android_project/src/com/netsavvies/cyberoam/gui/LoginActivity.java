@@ -17,8 +17,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.netsavvies.cyberoam.R;
+import com.netsavvies.cyberoam.backend.Control;
 
 public class LoginActivity extends Activity {
 
@@ -64,9 +66,9 @@ public class LoginActivity extends Activity {
          
 		
 		
-	     
+	     */
 		
-	/*	if(Control.isServiceRunning(this)==false)
+		if(Control.isServiceRunning(this)==false)
 		{
 		Toast.makeText(this,"HERE",Toast.LENGTH_SHORT).show();
 		Intent startServiceIntent = new Intent(this, com.netsavvies.cyberoam.backend.CybService.class);
@@ -75,16 +77,16 @@ public class LoginActivity extends Activity {
         Toast.makeText(this,"Service started by login activity",Toast.LENGTH_SHORT).show();
 		}
 		else
-			Toast.makeText(this,"Service already running",Toast.LENGTH_SHORT).show();*/
+			Toast.makeText(this,"Service already running",Toast.LENGTH_SHORT).show();
 	
 			
 			
-			 final SharedPreferences settings = getSharedPreferences("user_details", 0);
+		/*	 final SharedPreferences settings = getSharedPreferences("user_details", 0);
 			 SharedPreferences.Editor editor = settings.edit();
 		      editor.putString("user1","200901031");
 		      editor.putString("password1","divya");
 		      // Commit the edits!
-		      editor.commit();
+		      editor.commit();*/
 		}
 
 	@Override

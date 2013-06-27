@@ -84,7 +84,7 @@ public class Test extends Activity {
 		id=""+db1.getContactsCount();
 		display.setText(id);
         */
-        display.setText(Static.iswifiConnected(this)+"");
+     //   display.setText(Static.iswifiConnected(this)+"");
         
 	}
 

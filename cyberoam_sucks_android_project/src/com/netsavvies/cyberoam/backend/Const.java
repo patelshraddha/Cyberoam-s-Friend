@@ -14,6 +14,7 @@ public enum Const {
 	cyberLess,
 	
 	
+	
 	//messages
 	//TOP
 	start,
@@ -47,7 +48,8 @@ public enum Const {
 	maxLogin ,
 	reLogin ,
 	wrongIdPwd,
-
+    loggedIn,
+	
 	//receivers
 	//wifi
 	wifiLocha,
