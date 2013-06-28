@@ -762,9 +762,8 @@ public class CybService extends Service {
 
 	}
 
-	public void attemptLogout(Context context, String loginid,
-			String loginpassword) {
-		contactServer("193", loginid, loginpassword, context);
+	public void attemptLogout(Context context, String loginid,	String loginpassword) {
+		Log.wtf("logoutMsg", contactServer("193", loginid, loginpassword, context));
 
 	}
 
