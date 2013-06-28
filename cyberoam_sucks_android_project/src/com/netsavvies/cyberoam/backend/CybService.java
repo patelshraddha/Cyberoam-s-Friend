@@ -418,7 +418,7 @@ public class CybService extends Service {
 				dispatch(Const.net, Const.wifiKaLochaTheekKaro);
 				receiver(Const.wifiLocha, false);
 				execute(Const.wifi,false);
-				set(Const.wifiForLocha,true);
+				set(Const.wifiForLocha,false);
 				receiver(Const.wifi, true);
 				break;
 			case wifiKaBahotBadaLocha:
@@ -607,7 +607,7 @@ public class CybService extends Service {
 				break;
 			case lowSTR:
 				if (get(Const.l)) {
-					attemptLogout(getApplicationContext(), Vars.loginId,
+					Methods.attemptLogout(getApplicationContext(), Vars.loginId,
 							Vars.password);
 					set(Const.l, false);
 				}
@@ -626,7 +626,7 @@ public class CybService extends Service {
 						// inform that logged in but still no net
 					}
 				} else {
-					Const reason = attemptLogin();
+					Const reason = Methods.attemptLogin(getApplicationContext());
 					if (reason == Const.loggedIn) {
 						set(Const.l, true);
 						timer(Const.l, true);
@@ -652,7 +652,7 @@ public class CybService extends Service {
 			case wifiKaLochaTheekKaro:
 			case stop:
 				if (get(Const.l))
-					attemptLogout(getApplicationContext(), Vars.loginId,
+					Methods.attemptLogout(getApplicationContext(), Vars.loginId,
 							Vars.password);
 				set(Const.l, false);
 				break;
@@ -735,100 +735,14 @@ public class CybService extends Service {
 
 	}
 
-	public Const attemptLogin() {
-		int i = 1;
-		int maxLogin = 0;
+	
 
-		String message;
-		// while (getloginId(i) != null) {
-		message = contactServer("191", getloginId(i), getloginPassword(i),
-				getApplicationContext());
-		Log.wtf("loginMsg", message);
-		if (message.equals("You have successfully logged in")
-				|| message
-						.equals("You are already logged in as a clientless user")) {
-			// Static.isloggedIn = true;
-			Vars.loginId = getloginId(i);
-			Vars.password = getloginPassword(i);
-			return Const.loggedIn;
-			// break;
-		}
-		/*	else if(message.equals("You have reached the maximum login limit"))
-				maxLogin+=1;
-			else if()
-			i++;*/
-		else
-			return Const.maxLogin;
+	
 
-	}
+	
 
-	public void attemptLogout(Context context, String loginid,	String loginpassword) {
-		Log.wtf("logoutMsg", contactServer("193", loginid, loginpassword, context));
+	
 
-	}
-
-	private String contactServer(String loginmode, String loginid,
-			String loginpassword, Context context) {
-		String url = Vars.url;
-		String message = "empty";
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpPost client = new HttpPost(url);
-		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-		nvps.add(new BasicNameValuePair("mode", loginmode));
-		nvps.add(new BasicNameValuePair("username", loginid));
-		nvps.add(new BasicNameValuePair("password", loginpassword));
-		try {
-			client.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-		} catch (UnsupportedEncodingException e) { // TODO Auto-generated catch
-													// block
-			e.printStackTrace();
-		}
-		try {
-			HttpResponse response = httpclient.execute(client);
-			HttpEntity r_entity = response.getEntity();
-			String xmlString = EntityUtils.toString(r_entity);
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder db = factory.newDocumentBuilder();
-			InputSource inStream = new InputSource();
-			inStream.setCharacterStream(new StringReader(xmlString));
-			Document doc = db.parse(inStream);
-			NodeList nl = doc.getElementsByTagName("message");
-			for (int i = 0; i < nl.getLength(); i++) {
-				if (nl.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-					org.w3c.dom.Element nameElement = (org.w3c.dom.Element) nl
-							.item(i);
-					message = nameElement.getFirstChild().getNodeValue().trim();
-				}
-
-			}
-		} catch (ClientProtocolException e) { // TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) { // TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (SAXException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return message;
-	}
-
-	private String getloginId(int i) {
-		/*SharedPreferences settings = getApplicationContext()
-				.getSharedPreferences("user_details", 0);
-		String user = settings.getString("user" + i, null);
-		return user;*/
-		return "200901146";
-	}
-
-	private String getloginPassword(int i) {
-		SharedPreferences settings = getApplicationContext()
-				.getSharedPreferences("user_details", 0);
-		String password = settings.getString("password" + i, null);
-		return "reset123";
-	}
+	
 
 }
