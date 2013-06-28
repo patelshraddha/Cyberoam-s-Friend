@@ -40,6 +40,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiManager;
+import android.net.ConnectivityManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.StrictMode;
@@ -62,16 +63,17 @@ public class CybService extends Service {
 
 	private Hashtable<Const, BroadcastReceiver> bcr_hs;
 	private Hashtable<Const, Boolean> bcrExist_hs;
+
 	// all commands
 
 	private void init() {
-		
+
 		bool_hs = new Hashtable<Const, Boolean>();
 		run_hs = new Hashtable<Const, Runnable>();
 		runExist_hs = new Hashtable<Const, Boolean>();
-		bcr_hs = new Hashtable<Const, BroadcastReceiver>() ;
+		bcr_hs = new Hashtable<Const, BroadcastReceiver>();
 		bcrExist_hs = new Hashtable<Const, Boolean>();
-		
+
 		// set bools
 		set(Const.c, false);
 		set(Const.l, false);
@@ -85,9 +87,9 @@ public class CybService extends Service {
 
 			@Override
 			public void run() {
-				Log.d("hadler cybcheck",runExist_hs.put(Const.c, false)+"");
+				Log.d("hadler cybcheck", runExist_hs.put(Const.c, false) + "");
 				runExist_hs.put(Const.c, false);
-				timer(Const.c,true);
+				timer(Const.c, true);
 				dispatch(Const.top, Const.cybCheck);
 			}
 
@@ -96,18 +98,16 @@ public class CybService extends Service {
 
 			@Override
 			public void run() {
-				Log.d("hadler logincheck",runExist_hs.put(Const.c, false)+"");
-				if(runExist_hs.get(Const.l))
-				{
+				Log.d("hadler logincheck", runExist_hs.put(Const.c, false) + "");
+				if (runExist_hs.get(Const.l)) {
 					runExist_hs.put(Const.l, false);
-					timer(Const.l,true);
+					timer(Const.l, true);
 				}
-				if(runExist_hs.get(Const.lF))
-				{
-					timer(Const.lF,true);
-					runExist_hs.put(Const.lF, false);	
+				if (runExist_hs.get(Const.lF)) {
+					timer(Const.lF, true);
+					runExist_hs.put(Const.lF, false);
 				}
-				
+
 				dispatch(Const.top, Const.reLogin);
 			}
 
@@ -117,11 +117,11 @@ public class CybService extends Service {
 
 			@Override
 			public void run() {
-				Log.d("hadler netcheck",runExist_hs.put(Const.c, false)+"");
+				Log.d("hadler netcheck", runExist_hs.put(Const.c, false) + "");
 				runExist_hs.put(Const.net, false);
-				timer(Const.net,true);
+				timer(Const.net, true);
 				dispatch(Const.top, Const.netCheck);
-				
+
 			}
 		});
 
@@ -137,11 +137,15 @@ public class CybService extends Service {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				// TODO Auto-generated method stub
-				if (intent.getAction().equals(
-						WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) {
-					if (intent.getBooleanExtra(
+					/*if (intent.getBooleanExtra(
 							WifiManager.EXTRA_SUPPLICANT_CONNECTED, false)) {
+						dispatch(Const.top, Const.wifiConnected);
+					} else {
+						dispatch(Const.top, Const.wifiDisconnected);
+					}*/
+				
+				if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+					if (Methods.isWifiConnected(context)) {
 						dispatch(Const.top, Const.wifiConnected);
 					} else {
 						dispatch(Const.top, Const.wifiDisconnected);
@@ -150,15 +154,12 @@ public class CybService extends Service {
 			}
 		});
 		bcr_hs.put(Const.wifiLocha, new BroadcastReceiver() {
-
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				// TODO Auto-generated method stub
-				if (intent.getAction().equals(
-						WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION)) {
-					if (intent.getBooleanExtra( WifiManager.EXTRA_SUPPLICANT_CONNECTED, false)) {
+				if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+					if (Methods.isWifiConnected(context))
 						dispatch(Const.top, Const.wifiKaLochaTheekKaro);
-					}
 				}
 			}
 		});
@@ -167,79 +168,78 @@ public class CybService extends Service {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if (intent.getAction().equals(WifiManager.RSSI_CHANGED_ACTION)) {
-					//TODO: use extra
-					if(check(Const.str)) {
-						if(!get(Const.str)){
-							set(Const.str,true);
-							dispatch(Const.top,Const.strChange);
+					// TODO: use extra
+					if (check(Const.str)) {
+						if (!get(Const.str)) {
+							set(Const.str, true);
+							dispatch(Const.top, Const.strChange);
 						}
-					}
-					else {
-							if(get(Const.str)){
-								set(Const.str,false);
-								dispatch(Const.top,Const.strChange);
-							}
+					} else {
+						if (get(Const.str)) {
+							set(Const.str, false);
+							dispatch(Const.top, Const.strChange);
+						}
 					}
 				}
 			}
 		});
-		
-		bcrExist_hs.put(Const.wifi,false);
-		bcrExist_hs.put(Const.wifiLocha,false);
-		bcrExist_hs.put(Const.str,false);
-		
+
+		bcrExist_hs.put(Const.wifi, false);
+		bcrExist_hs.put(Const.wifiLocha, false);
+		bcrExist_hs.put(Const.str, false);
+
 	}
-	
-	private void execute(Const key,boolean bool){
-		Log.d("Exe",key.name()+" "+bool);
-		switch(key){
+
+	private void execute(Const key, boolean bool) {
+		Log.d("Exe", key.name() + " " + bool);
+		switch (key) {
 		case wifi:
-			Methods.turnWifi(this,bool);
-				
+			Methods.turnWifi(this, bool);
+
 		}
 	}
 
 	private void set(Const key, Boolean bool) {
+		Log.d("set", key.name() + " " + bool);
 		bool_hs.put(key, bool);
+		
 	}
 
 	private boolean get(Const key) {
-		
+
 		if (bool_hs.containsKey(key)) {
-			Log.d("get",key.name()+" "+bool_hs.get(key).toString());
+			Log.d("get", key.name() + " " + bool_hs.get(key).toString());
 			return bool_hs.get(key);
 		} else {
 			bool_hs.put(key, false);
-			Log.d("get",key.name()+" false");
+			Log.d("get", key.name() + " false");
 			return false;
 		}
 
 	}
 
 	private boolean check(Const key) {
-		
+		boolean result = false;
 		switch (key) {
 		case wifi:
-			Log.d("check", key.name()+" "+Methods.isWifiConnected(getApplicationContext()));
-			return Methods.isWifiConnected(getApplicationContext());
+			result =  Methods.isWifiConnected(getApplicationContext());
+			break;
 		case c:
-			Log.d("check", key.name()+" "+Methods.isCyberoamAvailbale(getApplicationContext()));
-			return Methods.isCyberoamAvailbale(getApplicationContext());
+			result = Methods.isCyberoamAvailbale(getApplicationContext());
+			break;
 		case l:
-			return get(key);
+			result= get(key);
 		case str:
-			Log.d("check", key.name()+" "+  Methods.isStrengthEnough(getApplicationContext()));
-			return Methods.isStrengthEnough(getApplicationContext());
-
-		default:
-			return false;
-
-		}
+			result= Methods.isStrengthEnough(getApplicationContext());
+         }
+		Log.d("check", key.name() + " " + result);
+		return result;
+		
 	}
 
 	private void timer(Const key, boolean bool) {
-		Log.d("timer", key.name()+" "+bool);
-		
+		Log.d("timer", key.name() + " " + bool);
+
 		switch (key) {
 		case l:
 			if (bool) {
@@ -247,7 +247,7 @@ public class CybService extends Service {
 				if (!(runExist_hs.get(Const.l) || runExist_hs.get(Const.lF))) {
 					handler.postDelayed(run_hs.get(Const.l), Vars.loginInterval);
 					runExist_hs.put(Const.l, true);
-					
+
 				}
 
 			} else {
@@ -265,7 +265,8 @@ public class CybService extends Service {
 					timer(Const.l, false);
 
 				} else if (!runExist_hs.get(Const.lF)) {
-					handler.postDelayed(run_hs.get(Const.l), Vars.loginTrialInterval);
+					handler.postDelayed(run_hs.get(Const.l),
+							Vars.loginTrialInterval);
 					runExist_hs.put(Const.lF, true);
 				}
 
@@ -279,7 +280,8 @@ public class CybService extends Service {
 		case c:
 			if (bool) {
 				if (!(runExist_hs.get(Const.c))) {
-					handler.postDelayed(run_hs.get(Const.c), Vars.cybCheckInterval);
+					handler.postDelayed(run_hs.get(Const.c),
+							Vars.cybCheckInterval);
 					runExist_hs.put(Const.c, true);
 				}
 
@@ -291,7 +293,8 @@ public class CybService extends Service {
 		case net:
 			if (bool) {
 				if (!(runExist_hs.get(Const.net))) {
-					handler.postDelayed(run_hs.get(Const.net), Vars.netCheckInterval);
+					handler.postDelayed(run_hs.get(Const.net),
+							Vars.netCheckInterval);
 					runExist_hs.put(Const.net, true);
 				}
 
@@ -305,36 +308,37 @@ public class CybService extends Service {
 	}
 
 	private void receiver(Const key, boolean bool) {
-		Log.d("reciever", key.name()+" "+bool);
-		
+		Log.d("reciever", key.name() + " " + bool);
+
 		switch (key) {
 		case wifi:
-			if (bool && !bcrExist_hs.get(Const.wifi) ) {
-				registerReceiver(bcr_hs.get(Const.wifi), new IntentFilter( WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
-				bcrExist_hs.put(Const.wifi,true);				
+			if (bool && !bcrExist_hs.get(Const.wifi)) {
+				registerReceiver(bcr_hs.get(Const.wifi), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+				bcrExist_hs.put(Const.wifi, true);
 			} else if (bcrExist_hs.get(Const.wifi)) {
 				unregisterReceiver(bcr_hs.get(Const.wifi));
-				bcrExist_hs.put(Const.wifi,false);	
+				bcrExist_hs.put(Const.wifi, false);
 			}
 			break;
 
 		case wifiLocha:
 			if (bool && !bcrExist_hs.get(Const.wifiLocha)) {
-				registerReceiver(bcr_hs.get(Const.wifiLocha), new IntentFilter(	WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
-				bcrExist_hs.put(Const.wifiLocha,true);
+				registerReceiver(bcr_hs.get(Const.wifiLocha), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+				bcrExist_hs.put(Const.wifiLocha, true);
 			} else if (bcrExist_hs.get(Const.wifiLocha)) {
 				unregisterReceiver(bcr_hs.get(Const.wifiLocha));
-				bcrExist_hs.put(Const.wifiLocha,false);	
+				bcrExist_hs.put(Const.wifiLocha, false);
 			}
 			break;
 
 		case str:
 			if (bool && !bcrExist_hs.get(Const.str)) {
-				registerReceiver(bcr_hs.get(Const.str), new IntentFilter(WifiManager.RSSI_CHANGED_ACTION));
-				bcrExist_hs.put(Const.str,true);
-			} else if (bcrExist_hs.get(Const.str)){
+				registerReceiver(bcr_hs.get(Const.str), new IntentFilter(
+						WifiManager.RSSI_CHANGED_ACTION));
+				bcrExist_hs.put(Const.str, true);
+			} else if (bcrExist_hs.get(Const.str)) {
 				unregisterReceiver(bcr_hs.get(Const.str));
-				bcrExist_hs.put(Const.str,false);
+				bcrExist_hs.put(Const.str, false);
 			}
 			break;
 
@@ -345,10 +349,10 @@ public class CybService extends Service {
 	}
 
 	private void dispatch(Const level, Const command) {
-		Log.d("dispatch", level.name()+" "+command.name());
-		
+		Log.d("dispatch", level.name() + " " + command.name());
+
 		switch (level) {
-		case top: 
+		case top:
 			switch (command) {
 			case stop:
 			case wrongIdPwd:
@@ -358,7 +362,7 @@ public class CybService extends Service {
 				}
 				break;
 			case start:
-				Log.d("blah","b");
+				Log.d("blah", "b");
 				if (!get(Const.isStopped)) {
 					dispatch(Const.wifi, command);
 				}
@@ -375,9 +379,9 @@ public class CybService extends Service {
 				}
 				break;
 			}
-		
-		break; // Top Over
-		
+
+			break; // Top Over
+
 		case wifi: {
 			// after getting ip address
 			switch (command) {
@@ -390,17 +394,17 @@ public class CybService extends Service {
 				if (check(Const.wifi)) {
 					dispatch(Const.net, command);
 				}
-				receiver(Const.wifi,true);
+				receiver(Const.wifi, true);
 				break;
 			case wifiKaLochaAaya:
 				receiver(Const.wifi, false);
 				receiver(Const.wifiLocha, true);
-				execute(Const.wifi,true);
+				execute(Const.wifi, true);
 				break;
 			case wifiKaLochaTheekKaro:
 				dispatch(Const.net, Const.wifiKaLochaTheekKaro);
 				receiver(Const.wifiLocha, false);
-				//execute(Const.wifi,false);
+				execute(Const.wifi,false);
 				receiver(Const.wifi, true);
 				break;
 			case wifiKaBahotBadaLocha:
@@ -411,8 +415,8 @@ public class CybService extends Service {
 				break;
 			}
 		}
-		break; // Wifi over
-		
+			break; // Wifi over
+
 		case net: {
 			switch (command) {
 			case wifiKaLochaTheekKaro:
@@ -440,7 +444,8 @@ public class CybService extends Service {
 				}
 				break;
 			case netCheck:
-				int retValue = Methods.isConnectionAlive(getApplicationContext());
+				int retValue = Methods
+						.isConnectionAlive(getApplicationContext());
 				if (retValue == 1)
 					set(Const.net, true);
 				else {
@@ -467,15 +472,15 @@ public class CybService extends Service {
 			}
 
 		}
-		break; // Net over
-		
+			break; // Net over
+
 		case str:
 			switch (command) {
 			case noNet:
 			case notLoggedIn:
-				set(Const.str,check(Const.str));
+				set(Const.str, check(Const.str));
 				break;
-				
+
 			case wifiKaLochaTheekKaro:
 				dispatch(Const.c, command);
 				return;
@@ -485,8 +490,7 @@ public class CybService extends Service {
 					set(Const.str, true);
 					receiver(Const.str, true);
 					dispatch(Const.c, command);
-				}
-				else {
+				} else {
 					receiver(Const.str, true);
 				}
 				return;
@@ -504,35 +508,32 @@ public class CybService extends Service {
 				}
 				return;
 			}
-			
-			if(get(Const.str))
-			{
-				switch(command)
-				{
-					case cybCheck:
-					case reLogin:
-					case noNet:
-					case notLoggedIn:
-						dispatch(Const.c,command);
+
+			if (get(Const.str)) {
+				switch (command) {
+				case cybCheck:
+				case reLogin:
+				case noNet:
+				case notLoggedIn:
+					dispatch(Const.c, command);
 					break;
-					default:
-						// locha
+				default:
+					// locha
 				}
 			}
 			break;
-		
-		
+
 		case c: {
 			if (check(Const.c)) {
 				timer(Const.c, false);
-				
+
 				if (!get(Const.c))
 					set(Const.c, true);
-				
+
 				switch (command) {
 				case stop:
 					set(Const.c, false);
-					dispatch(Const.l,command);
+					dispatch(Const.l, command);
 					break;
 				case wifiKaLochaTheekKaro:
 					dispatch(Const.l, Const.wifiKaLochaTheekKaro);
@@ -545,15 +546,15 @@ public class CybService extends Service {
 					break;
 				}
 			} else {
-				
+
 				switch (command) {
 				case wifiDisconnected:
 				case stop:
 					set(Const.c, false);
 					timer(Const.c, false);
-					dispatch(Const.l,command);
+					dispatch(Const.l, command);
 					break;
-					
+
 				case noNet:
 				case cybCheck:
 				case wifiConnected:
@@ -563,11 +564,11 @@ public class CybService extends Service {
 					timer(Const.c, true);
 					break;
 
-				case wifiKaLochaTheekKaro: 
+				case wifiKaLochaTheekKaro:
 					dispatch(Const.top, Const.wifiKaBahotBadaLocha);
 					timer(Const.c, false);
 					break;
-					
+
 				default:
 					timer(Const.c, false);
 					break;
@@ -580,9 +581,8 @@ public class CybService extends Service {
 
 			}
 		}
-		break; // C over
-		
-		
+			break; // C over
+
 		case l: {
 			timer(Const.l, false);
 			switch (command) {
@@ -593,7 +593,8 @@ public class CybService extends Service {
 				break;
 			case lowSTR:
 				if (get(Const.l)) {
-					attemptLogout(getApplicationContext(),Vars.loginId,Vars.password);
+					attemptLogout(getApplicationContext(), Vars.loginId,
+							Vars.password);
 					set(Const.l, false);
 				}
 				break;
@@ -605,7 +606,7 @@ public class CybService extends Service {
 			case reLogin:
 			case wifiConnected:
 			case noNet:
-			case start: 
+			case start:
 				if ((get(Const.l)) && (command != Const.reLogin)) {
 					if (command == Const.noNet) {
 						// inform that logged in but still no net
@@ -616,8 +617,7 @@ public class CybService extends Service {
 						set(Const.l, true);
 						timer(Const.l, true);
 						dispatch(Const.top, Const.netRecheck);
-					}
-					else {
+					} else {
 						set(Const.l, false);
 						switch (reason) {
 						case maxLogin:
@@ -632,17 +632,18 @@ public class CybService extends Service {
 						}
 					}
 				}
-				
+
 				break;
 
 			case wifiKaLochaTheekKaro:
-			case stop: 
-				if(get(Const.l))
-					attemptLogout(getApplicationContext(),Vars.loginId,Vars.password);
-				set(Const.l,false);
+			case stop:
+				if (get(Const.l))
+					attemptLogout(getApplicationContext(), Vars.loginId,
+							Vars.password);
+				set(Const.l, false);
 				break;
 
-			case wifiDisconnected: 
+			case wifiDisconnected:
 				if (get(Const.l))
 					dispatch(Const.top, Const.wifiKaLochaAaya);
 				break;
@@ -655,18 +656,17 @@ public class CybService extends Service {
 		}
 	}
 
-	
 	@Override
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		super.onCreate();
-		
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
 
-		StrictMode.setThreadPolicy(policy); 
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
+
+		StrictMode.setThreadPolicy(policy);
 		init();
-		dispatch(Const.top,Const.start);
-		
+		dispatch(Const.top, Const.start);
 
 	}
 
@@ -674,7 +674,7 @@ public class CybService extends Service {
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		this.unregisterReceiver(this.receiversForCybService);
+		dispatch(Const.top, Const.stop);
 	}
 
 	@Override
@@ -686,10 +686,10 @@ public class CybService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		// TODO Auto-generated method stub
-		//String action = intent.getStringExtra("action");
+		// String action = intent.getStringExtra("action");
 		Vars.isloggedIn = false;
 		Vars.loginId = null;
-		
+
 		// Build notification
 		// Actions are just fake
 
@@ -729,13 +729,13 @@ public class CybService extends Service {
 		// while (getloginId(i) != null) {
 		message = contactServer("191", getloginId(i), getloginPassword(i),
 				getApplicationContext());
-		Log.d("loginMsg",message);
+		Log.d("loginMsg", message);
 		if (message.equals("You have successfully logged in")
 				|| message
 						.equals("You are already logged in as a clientless user")) {
 			// Static.isloggedIn = true;
 			Vars.loginId = getloginId(i);
-			Vars.password=getloginPassword(i);
+			Vars.password = getloginPassword(i);
 			return Const.loggedIn;
 			// break;
 		}

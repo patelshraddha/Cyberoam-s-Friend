@@ -28,20 +28,6 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 
 class Methods {
-	static int getConnectivityStatus(Context context) {
-		ConnectivityManager cm = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-
-		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-		if (null != activeNetwork) {
-			if (activeNetwork.getType() == ConnectivityManager.TYPE_WIFI)
-				return 1;
-
-			if (activeNetwork.getType() == ConnectivityManager.TYPE_MOBILE)
-				return 2;
-		}
-		return 0;
-	}
 
 	static boolean isCyberoamAvailbale(Context context) {
 		if (!isWifiConnected(context))
@@ -73,9 +59,9 @@ class Methods {
 		NetworkInfo mWifi = connManager
 				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-		Log.d("isWifiConnected",mWifi.isConnectedOrConnecting()+" "+context.toString());
+		Log.d("isWifiConnected",mWifi.isConnected()+"");
 		
-		return mWifi.isConnectedOrConnecting();
+		return mWifi.isConnected();
 	}
 
 	static int isConnectionAlive(Context context) {
@@ -106,15 +92,15 @@ class Methods {
 				}
 
 			}
-		} catch (ClientProtocolException e) { // TODO Auto-generated catch block
+		} catch (ClientProtocolException e) { 
 			e.printStackTrace();
-		} catch (IOException e) { // TODO Auto-generated catch block
+		} catch (IOException e) { 
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 
 		}
