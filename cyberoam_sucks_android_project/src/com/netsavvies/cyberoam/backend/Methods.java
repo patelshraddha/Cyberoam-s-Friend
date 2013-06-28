@@ -59,7 +59,7 @@ class Methods {
 		NetworkInfo mWifi = connManager
 				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-		Log.d("isWifiConnected",mWifi.isConnected()+"");
+		Log.wtf("isWifiConnected",mWifi.isConnected()+"");
 		
 		return mWifi.isConnected();
 	}
@@ -136,7 +136,7 @@ class Methods {
 		
 		WifiManager mywifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 		int level = calculateSignalLevel((mywifiManager.getConnectionInfo().getRssi()));
-		Log.d("WifiStrength",level+"");
+		Log.wtf("WifiStrength",level+"");
 	    if(level >= Vars.thresholdStrength)
 	    	return true;
 	    else

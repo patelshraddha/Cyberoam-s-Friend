@@ -87,7 +87,7 @@ public class CybService extends Service {
 
 			@Override
 			public void run() {
-				Log.d("hadler cybcheck", runExist_hs.put(Const.c, false) + "");
+				Log.wtf("hadler cybcheck", runExist_hs.put(Const.c, false) + "");
 				runExist_hs.put(Const.c, false);
 				timer(Const.c, true);
 				dispatch(Const.top, Const.cybCheck);
@@ -98,7 +98,7 @@ public class CybService extends Service {
 
 			@Override
 			public void run() {
-				Log.d("hadler logincheck", runExist_hs.put(Const.c, false) + "");
+				Log.wtf("hadler logincheck", runExist_hs.put(Const.c, false) + "");
 				if (runExist_hs.get(Const.l)) {
 					runExist_hs.put(Const.l, false);
 					timer(Const.l, true);
@@ -117,7 +117,7 @@ public class CybService extends Service {
 
 			@Override
 			public void run() {
-				Log.d("hadler netcheck", runExist_hs.put(Const.c, false) + "");
+				Log.wtf("hadler netcheck", runExist_hs.put(Const.c, false) + "");
 				runExist_hs.put(Const.net, false);
 				timer(Const.net, true);
 				dispatch(Const.top, Const.netCheck);
@@ -202,7 +202,7 @@ public class CybService extends Service {
 	}
 
 	private void execute(Const key, boolean bool) {
-		Log.d("Execute", key.name() + " " + bool);
+		Log.wtf("Execute", key.name() + " " + bool);
 		switch (key) {
 		case wifi:
 			Methods.turnWifi(this, bool);
@@ -211,7 +211,7 @@ public class CybService extends Service {
 	}
 
 	private void set(Const key, Boolean bool) {
-		Log.d("set", key.name() + " " + bool);
+		Log.wtf("set", key.name() + " " + bool);
 		bool_hs.put(key, bool);
 		
 	}
@@ -219,11 +219,11 @@ public class CybService extends Service {
 	private boolean get(Const key) {
 
 		if (bool_hs.containsKey(key)) {
-			Log.d("get", key.name() + " " + bool_hs.get(key).toString());
+			Log.wtf("get", key.name() + " " + bool_hs.get(key).toString());
 			return bool_hs.get(key);
 		} else {
 			bool_hs.put(key, false);
-			Log.d("get", key.name() + " false");
+			Log.wtf("get", key.name() + " false");
 			return false;
 		}
 
@@ -243,13 +243,13 @@ public class CybService extends Service {
 		case str:
 			result= Methods.isStrengthEnough(getApplicationContext());
          }
-		Log.d("check", key.name() + " " + result);
+		Log.wtf("check", key.name() + " " + result);
 		return result;
 		
 	}
 
 	private void timer(Const key, boolean bool) {
-		Log.d("timer", key.name() + " " + bool);
+		Log.wtf("timer", key.name() + " " + bool);
 
 		switch (key) {
 		case l:
@@ -318,7 +318,7 @@ public class CybService extends Service {
 	}
 
 	private void receiver(Const key, boolean bool) {
-		Log.d("reciever", key.name() + " " + bool);
+		Log.wtf("reciever", key.name() + " " + bool);
 
 		switch (key) {
 		case wifi:
@@ -359,7 +359,7 @@ public class CybService extends Service {
 	}
 
 	private void dispatch(Const level, Const command) {
-		Log.d("dispatch", level.name() + " " + command.name());
+		Log.wtf("dispatch", level.name() + " " + command.name());
 
 		switch (level) {
 		case top:
@@ -372,7 +372,7 @@ public class CybService extends Service {
 				}
 				break;
 			case start:
-				Log.d("blah", "b");
+				Log.wtf("blah", "b");
 				if (!get(Const.isStopped)) {
 					dispatch(Const.wifi, command);
 				}
@@ -391,10 +391,10 @@ public class CybService extends Service {
 			}
 
 			break; // Top Over
-
+			
 		case wifi: {
 			// after getting ip address
-			switch (command) {
+			switch (command){
 			case wifiConnected:
 			case wifiDisconnected:
 			case stop:
@@ -703,7 +703,7 @@ public class CybService extends Service {
 		// String action = intent.getStringExtra("action");
 		Vars.isloggedIn = false;
 		Vars.loginId = null;
-
+		
 		// Build notification
 		// Actions are just fake
 
@@ -743,7 +743,7 @@ public class CybService extends Service {
 		// while (getloginId(i) != null) {
 		message = contactServer("191", getloginId(i), getloginPassword(i),
 				getApplicationContext());
-		Log.d("loginMsg", message);
+		Log.wtf("loginMsg", message);
 		if (message.equals("You have successfully logged in")
 				|| message
 						.equals("You are already logged in as a clientless user")) {
