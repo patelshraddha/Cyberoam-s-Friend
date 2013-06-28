@@ -66,17 +66,16 @@ class Methods {
 	}
 
 	static boolean isWifiConnected(Context context) {
+		
 		// TODO Auto-generated method stub
 		ConnectivityManager connManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo mWifi = connManager
 				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-		if (mWifi.isConnected())
-			return true;
-		else
-			return false;
-
+		Log.d("isWifiConnected",mWifi.isConnectedOrConnecting()+" "+context.toString());
+		
+		return mWifi.isConnectedOrConnecting();
 	}
 
 	static int isConnectionAlive(Context context) {
@@ -157,6 +156,10 @@ class Methods {
 	    else
 	    	return false;
 	
+	}
+	
+	static void turnWifi(Context context,boolean bool){
+		((WifiManager) context.getSystemService(Context.WIFI_SERVICE)).setWifiEnabled(bool); 
 	}
 
 	static int calculateSignalLevel(int rssi) {

@@ -189,6 +189,15 @@ public class CybService extends Service {
 		bcrExist_hs.put(Const.str,false);
 		
 	}
+	
+	private void execute(Const key,boolean bool){
+		Log.d("Exe",key.name()+" "+bool);
+		switch(key){
+		case wifi:
+			Methods.turnWifi(this,bool);
+				
+		}
+	}
 
 	private void set(Const key, Boolean bool) {
 		bool_hs.put(key, bool);
@@ -305,6 +314,7 @@ public class CybService extends Service {
 				bcrExist_hs.put(Const.wifi,true);				
 			} else if (bcrExist_hs.get(Const.wifi)) {
 				unregisterReceiver(bcr_hs.get(Const.wifi));
+				bcrExist_hs.put(Const.wifi,false);	
 			}
 			break;
 
@@ -314,6 +324,7 @@ public class CybService extends Service {
 				bcrExist_hs.put(Const.wifiLocha,true);
 			} else if (bcrExist_hs.get(Const.wifiLocha)) {
 				unregisterReceiver(bcr_hs.get(Const.wifiLocha));
+				bcrExist_hs.put(Const.wifiLocha,false);	
 			}
 			break;
 
@@ -323,6 +334,7 @@ public class CybService extends Service {
 				bcrExist_hs.put(Const.str,true);
 			} else if (bcrExist_hs.get(Const.str)){
 				unregisterReceiver(bcr_hs.get(Const.str));
+				bcrExist_hs.put(Const.str,false);
 			}
 			break;
 
@@ -375,20 +387,20 @@ public class CybService extends Service {
 				dispatch(Const.net, command);
 				break;
 			case start:
-				receiver(Const.wifi,true);
 				if (check(Const.wifi)) {
 					dispatch(Const.net, command);
 				}
+				receiver(Const.wifi,true);
 				break;
 			case wifiKaLochaAaya:
 				receiver(Const.wifi, false);
 				receiver(Const.wifiLocha, true);
-				// do(wifi,true)
+				execute(Const.wifi,true);
 				break;
 			case wifiKaLochaTheekKaro:
 				dispatch(Const.net, Const.wifiKaLochaTheekKaro);
 				receiver(Const.wifiLocha, false);
-				// do(wifi,false);
+				//execute(Const.wifi,false);
 				receiver(Const.wifi, true);
 				break;
 			case wifiKaBahotBadaLocha:
@@ -457,9 +469,13 @@ public class CybService extends Service {
 		}
 		break; // Net over
 		
-		case str: {
+		case str:
 			switch (command) {
-
+			case noNet:
+			case notLoggedIn:
+				set(Const.str,check(Const.str));
+				break;
+				
 			case wifiKaLochaTheekKaro:
 				dispatch(Const.c, command);
 				return;
@@ -488,22 +504,23 @@ public class CybService extends Service {
 				}
 				return;
 			}
-		} 
-		if(get(Const.str))
-		{
-			switch(command)
+			
+			if(get(Const.str))
 			{
-				case cybCheck:
-				case reLogin:
-				case noNet:
-				case notLoggedIn:
-					dispatch(Const.c,command);
-				break;
-				default:
-					// locha
+				switch(command)
+				{
+					case cybCheck:
+					case reLogin:
+					case noNet:
+					case notLoggedIn:
+						dispatch(Const.c,command);
+					break;
+					default:
+						// locha
+				}
 			}
-		}
-		break;
+			break;
+		
 		
 		case c: {
 			if (check(Const.c)) {
