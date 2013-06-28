@@ -395,9 +395,10 @@ public class CybService extends Service {
 		case wifi: {
 			// after getting ip address
 			switch (command){
+			case stop:
+				receiver(Const.wifi, false);
 			case wifiConnected:
 			case wifiDisconnected:
-			case stop:
 				dispatch(Const.net, command);
 				break;
 			case start:
@@ -560,7 +561,6 @@ public class CybService extends Service {
 					break;
 				}
 			} else {
-
 				switch (command) {
 				case wifiDisconnected:
 				case stop:
@@ -578,6 +578,7 @@ public class CybService extends Service {
 					timer(Const.c, true);
 					break;
 
+				case lowSTR:
 				case wifiKaLochaTheekKaro:
 					dispatch(Const.top, Const.wifiKaBahotBadaLocha);
 					timer(Const.c, false);
@@ -685,9 +686,26 @@ public class CybService extends Service {
 	}
 
 	@Override
+	public void onLowMemory() {
+		// TODO Auto-generated method stub
+		super.onLowMemory();
+		Log.wtf("WTF","lowMemory");
+		dispatch(Const.top, Const.stop);
+	}
+
+	@Override
+	public void onTrimMemory(int level) {
+		// TODO Auto-generated method stub
+		super.onTrimMemory(level);
+		Log.wtf("WTF","trimMemory");
+		dispatch(Const.top, Const.stop);
+	}
+
+	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
+		Log.wtf("WTF","destroy");
 		dispatch(Const.top, Const.stop);
 	}
 
