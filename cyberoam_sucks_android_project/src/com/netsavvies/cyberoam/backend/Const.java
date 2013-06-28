@@ -4,6 +4,7 @@ public enum Const {
 	// booleans, dispatch levels 
 	top,
 	wifi,
+	wifiForLocha,
 	net,
 	str,
 	c,
