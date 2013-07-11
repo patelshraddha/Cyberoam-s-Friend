@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.netsavvies.cyberoam.R;
 import com.netsavvies.cyberoam.backend.Control;
 
@@ -35,6 +34,7 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.activity_login);
 		display=(TextView)findViewById(R.id.textview);
 
@@ -106,6 +106,7 @@ public class LoginActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
+		
 		getMenuInflater().inflate(R.menu.login, menu);
 		return true;
 	}

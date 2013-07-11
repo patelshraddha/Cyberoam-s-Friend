@@ -62,7 +62,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	public void addUser(UserDetails userDetails) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
-		// userDetails.setPriority(this.getContactsCount() + 1);
+		userDetails.setPriority(this.getUsersCount() + 1);
 		values.put(KEY_PRIORITY, userDetails.getPriority());
 		values.put(KEY_ID, userDetails.getId()); // user id
 		values.put(KEY_PASSWORD, userDetails.getPassword()); // Contact password
@@ -138,8 +138,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Getting All Contacts
 	public void deleteAllUsers() {
-		ArrayList<UserDetails> userList = new ArrayList<UserDetails>();
-		// Selec All Query
+		
+		
 		String selectQuery = "SELECT  * FROM " + TABLE_DETAILS;
 
 		SQLiteDatabase db = this.getWritableDatabase();
@@ -162,38 +162,50 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	// Updating single contact
-	public int updateContact(UserDetails userDetails, int i) {
+	public void updatePriority(UserDetails userDetails, int i) {
 		SQLiteDatabase db = this.getWritableDatabase();
-
-		ContentValues values = new ContentValues();
-		values.put(KEY_CHECKED, userDetails.getChecked());
-		values.put(KEY_PRIORITY, userDetails.getPriority());
-		values.put(KEY_ID, userDetails.getId());
-		values.put(KEY_PASSWORD, userDetails.getPassword());
-
-		// updating row
-		int r = db.update(TABLE_DETAILS, values, KEY_PRIORITY + " = ?",
-				new String[] { String.valueOf(i) });
+        ContentValues values = new ContentValues();
+		values.put(KEY_PRIORITY,i);
+		int r = db.update(TABLE_DETAILS, values, KEY_PRIORITY + "="+userDetails.getPriority(),null);
 		db.close();
-		return r;
+	}
+	
+	public void updateChecked(UserDetails userDetails, int i) {
+		SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+		values.put(KEY_CHECKED,i);
+		int r = db.update(TABLE_DETAILS, values, KEY_PRIORITY + "="+userDetails.getPriority(),null);
+		db.close();
 	}
 
 	// Deleting single contact
-	public void deleteContact(int priority) {
+	public void deleteUser(int priority) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.delete(TABLE_DETAILS, KEY_PRIORITY + " = ?",
 				new String[] { String.valueOf(priority) });
 		db.close();
+		int i=0;
+		for(i=priority+1;i<=getUsersCount()+1;i++)
+		updatePriority(getUser(i),i-1);
+			
 	}
 
 	// Getting contacts Count
-	public long getContactsCount() {
+	public int getUsersCount() {
+		int size=0;
+		// Selec All Query
+		String selectQuery = "SELECT  * FROM " + TABLE_DETAILS;
 
 		SQLiteDatabase db = this.getWritableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
 
-		long count = DatabaseUtils.queryNumEntries(db, TABLE_DETAILS);
-		db.close();
-		return count;
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				size++;
+			} while (cursor.moveToNext());
+		}
+		return size;
 	}
 
 }

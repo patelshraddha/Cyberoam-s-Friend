@@ -2,7 +2,12 @@
 <resources>
 
     <string name="app_name">Cyberoam sucks!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_settings">Add another user!!</string>
     <string name="hello_world">Hello world!</string>
+    <string name="useridinput">Enter the user id</string>
+    <string name="userpassword">Enter the password</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_settings">Delete all users</string>
 
 </resources>

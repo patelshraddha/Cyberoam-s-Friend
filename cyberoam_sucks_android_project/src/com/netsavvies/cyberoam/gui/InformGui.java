@@ -24,7 +24,7 @@ public class InformGui {
 	
 	
 	public static void Notify(String subject, Context context) {
-
+		
 		Intent intent = new Intent(context, LoginActivity.class);
 		PendingIntent pIntent = PendingIntent
 				.getActivity(context, 0, intent, 0);

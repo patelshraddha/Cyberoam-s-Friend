@@ -3,8 +3,8 @@ package com.netsavvies.cyberoam.gui.dragNdrop;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import com.netsavvies.cyberoam.R;
+//TODO remove comment
+//import com.netsavvies.cyberoam.R;
 import com.netsavvies.cyberoam.backend.*;
 
 
@@ -18,11 +18,13 @@ public class Test extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+		
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		// TODO remove comment
+		//setContentView(R.layout.main);
 		DatabaseHandler db =new DatabaseHandler(this);
-        TextView display=(TextView)findViewById(R.id.demot);
+		// TODO remove comment
+       // TextView display=(TextView)findViewById(R.id.demot);
 		
 		
 		/**
