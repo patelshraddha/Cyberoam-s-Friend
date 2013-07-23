@@ -25,7 +25,7 @@
          android:enabled="true" />
     
         <activity
-            android:name="com.netsavvies.cyberoam.gui.dragNdrop.DragNDropListActivity"
+            android:name="com.netsavvies.cyberoam.gui.LoginActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

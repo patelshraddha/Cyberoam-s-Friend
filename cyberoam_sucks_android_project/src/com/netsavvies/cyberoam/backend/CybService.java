@@ -4,50 +4,22 @@ package com.netsavvies.cyberoam.backend;
  * The service which performs the actual tasks. Started by Control.class/CybApp.class or by the system at boot and not directly accessible by gui
  */
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
+import com.netsavvies.cyberoam.gui.InformGui;
 
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.net.wifi.WifiManager;
 import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.StrictMode;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.netsavvies.cyberoam.gui.InformGui;
+import static com.netsavvies.cyberoam.backend.Const.*;
 
 public class CybService extends Service {
 
@@ -74,130 +46,138 @@ public class CybService extends Service {
 		bcr_hs = new Hashtable<Const, BroadcastReceiver>();
 		bcrExist_hs = new Hashtable<Const, Boolean>();
 
-		// set bools
-		set(Const.c, false);
-		set(Const.l, false);
-		set(Const.str, false);
-		set(Const.wifi, false);
-		set(Const.isStopped, false);
-		set(Const.cyberLess, false);
-
+		// set boolean & noti
+		
+		/* not needed
+		set(c, false);
+		set(l, false);
+		set(str, false);
+		set(wifi, false);
+		set(isStopped, false);
+		set(cyberLess, false);
+		*/
+		
+		
 		// set handler and tasks
-		run_hs.put(Const.c, new Runnable() {
+		run_hs.put(c, new Runnable() {
 
 			@Override
 			public void run() {
-				Log.wtf("hadler cybcheck", runExist_hs.put(Const.c, false) + "");
-				runExist_hs.put(Const.c, false);
-				timer(Const.c, true);
-				dispatch(Const.top, Const.cybCheck);
+				Log.wtf("hadler cybcheck", runExist_hs.put(c, false) + "");
+				runExist_hs.put(c, false);
+				timer(c, true);
+				dispatch(top, cybCheck);
 			}
 
 		});
-		run_hs.put(Const.l, new Runnable() {
+		run_hs.put(l, new Runnable() {
 
 			@Override
 			public void run() {
-				Log.wtf("hadler logincheck", runExist_hs.put(Const.c, false) + "");
-				if (runExist_hs.get(Const.l)) {
-					runExist_hs.put(Const.l, false);
-					timer(Const.l, true);
+				Log.wtf("hadler logincheck", runExist_hs.put(c, false) + "");
+				if (runExist_hs.get(l)) {
+					runExist_hs.put(l, false);
+					timer(l, true);
 				}
-				if (runExist_hs.get(Const.lF)) {
-					runExist_hs.put(Const.lF, false);
-					timer(Const.lF, true);
+				if (runExist_hs.get(lF)) {
+					runExist_hs.put(lF, false);
+					timer(lF, true);
 				}
 
-				dispatch(Const.top, Const.reLogin);
+				dispatch(top, reLogin);
 			}
 
 		});
 
-		run_hs.put(Const.net, new Runnable() {
+		run_hs.put(net, new Runnable() {
 
 			@Override
 			public void run() {
-				Log.wtf("hadler netcheck", runExist_hs.put(Const.c, false) + "");
-				runExist_hs.put(Const.net, false);
-				timer(Const.net, true);
-				dispatch(Const.top, Const.netCheck);
+				Log.wtf("hadler netcheck", runExist_hs.put(c, false) + "");
+				runExist_hs.put(net, false);
+				timer(net, true);
+				dispatch(top, netCheck);
 
 			}
 		});
 
-		runExist_hs.put(Const.c, false);
-		runExist_hs.put(Const.l, false);
-		runExist_hs.put(Const.lF, false);
-		runExist_hs.put(Const.net, false);
+		runExist_hs.put(c, false);
+		runExist_hs.put(l, false);
+		runExist_hs.put(lF, false);
+		runExist_hs.put(net, false);
 
 		handler = new Handler();
 
 		// receivers
-		bcr_hs.put(Const.wifi, new BroadcastReceiver() {
+		bcr_hs.put(wifi, new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
 					/*if (intent.getBooleanExtra(
 							WifiManager.EXTRA_SUPPLICANT_CONNECTED, false)) {
-						dispatch(Const.top, Const.wifiConnected);
+						dispatch(top, wifiConnected);
 					} else {
-						dispatch(Const.top, Const.wifiDisconnected);
+						dispatch(top, wifiDisconnected);
 					}*/
 				
 				if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 					if (Methods.isWifiConnected(context)) {
 					
-						if(!get(Const.wifi)){
-							set(Const.wifi,true);
-							dispatch(Const.top, Const.wifiConnected);
+						if(!get(wifi)){
+							set(wifi,true);
+							dispatch(top, wifiConnected);
 						}
 					
-					} else if (get(Const.wifi)){
-						set(Const.wifi,false);
-						dispatch(Const.top, Const.wifiDisconnected);
+					} else if (get(wifi)){
+						set(wifi,false);
+						dispatch(top, wifiDisconnected);
 					}
 				}
 			}
 		});
-		bcr_hs.put(Const.wifiLocha, new BroadcastReceiver() {
+		bcr_hs.put(wifiLocha, new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				// TODO Auto-generated method stub
 				if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
 					if (Methods.isWifiConnected(context)   ){
-						if(!get(Const.wifiForLocha)){
-							set(Const.wifiForLocha,true);
-							dispatch(Const.top, Const.wifiKaLochaTheekKaro);
+						if(!get(wifiForLocha)){
+							set(wifiForLocha,true);
+							dispatch(top, wifiKaLochaTheekKaro);
 						}
 						
 					}
 				}
 			}
 		});
-		bcr_hs.put(Const.str, new BroadcastReceiver() {
+		bcr_hs.put(str, new BroadcastReceiver() {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if (intent.getAction().equals(WifiManager.RSSI_CHANGED_ACTION)) {
 					// TODO: use extra
-					if (check(Const.str)) {
-						if (!get(Const.str)) {
-							set(Const.str, true);
-							dispatch(Const.top, Const.strChange);
+					if (check(str)) {
+						if (!get(str)) {
+							set(str, true);
+							dispatch(top, strChange);
 						}
 					} else {
-						if (get(Const.str)) {
-							set(Const.str, false);
-							dispatch(Const.top, Const.strChange);
+						if (get(str)) {
+							set(str, false);
+							dispatch(top, strChange);
 						}
 					}
 				}
 			}
 		});
 
-		bcrExist_hs.put(Const.wifi, false);
-		bcrExist_hs.put(Const.wifiLocha, false);
-		bcrExist_hs.put(Const.str, false);
+		bcrExist_hs.put(wifi, false);
+		bcrExist_hs.put(wifiLocha, false);
+		bcrExist_hs.put(str, false);
+		
+		
+		//noti 
+		updateNotification();
 
 	}
 
@@ -210,23 +190,51 @@ public class CybService extends Service {
 		}
 	}
 
+	private void updateNotification(){
+		String txt= "W:"+gettf(wifi)+" N:"+gettf(net)+" S:"+gettf(str)+" C:"+gettf(c)+" L:"+gettf(l);
+		InformGui.Notify(txt, this);
+	}
+	
 	private void set(Const key, Boolean bool) {
 		Log.wtf("set", key.name() + " " + bool);
 		bool_hs.put(key, bool);
-		
+		updateNotification();
 	}
 
 	private boolean get(Const key) {
-
-		if (bool_hs.containsKey(key)) {
-			Log.wtf("get", key.name() + " " + bool_hs.get(key).toString());
-			return bool_hs.get(key);
+		if (getNoLog(key)) {
+			Log.wtf("get", key.name() + " true");
+			return true;
 		} else {
-			bool_hs.put(key, false);
 			Log.wtf("get", key.name() + " false");
 			return false;
 		}
+	}
+	
+	private boolean getNoLog(Const key) {
 
+		if (bool_hs.containsKey(key)) {
+			return bool_hs.get(key);
+		} else {
+			bool_hs.put(key, false);
+			return false;
+		}
+
+	}
+	
+	
+	private char getTF(Const key){
+		if(getNoLog(key)) 
+			return 'T';
+		else 
+			return 'F';
+	}
+	
+	private char gettf(Const key){
+		if(getNoLog(key)) 
+			return 't';
+		else 
+			return 'f';
 	}
 
 	private boolean check(Const key) {
@@ -255,16 +263,16 @@ public class CybService extends Service {
 		case l:
 			if (bool) {
 
-				if (!(runExist_hs.get(Const.l) || runExist_hs.get(Const.lF))) {
-					handler.postDelayed(run_hs.get(Const.l), Vars.loginInterval);
-					runExist_hs.put(Const.l, true);
+				if (!(runExist_hs.get(l) || runExist_hs.get(lF))) {
+					handler.postDelayed(run_hs.get(l), Vars.loginInterval);
+					runExist_hs.put(l, true);
 
 				}
 
 			} else {
 
-				handler.removeCallbacks(run_hs.get(Const.l));
-				runExist_hs.put(Const.l, false);
+				handler.removeCallbacks(run_hs.get(l));
+				runExist_hs.put(l, false);
 			}
 
 			break;
@@ -272,46 +280,46 @@ public class CybService extends Service {
 		case lF:
 			if (bool) {
 
-				if (runExist_hs.get(Const.l)) {
-					timer(Const.l, false);
+				if (runExist_hs.get(l)) {
+					timer(l, false);
 
-				} else if (!runExist_hs.get(Const.lF)) {
-					handler.postDelayed(run_hs.get(Const.l),Vars.loginTrialInterval);
-					runExist_hs.put(Const.lF, true);
+				} else if (!runExist_hs.get(lF)) {
+					handler.postDelayed(run_hs.get(l),Vars.loginTrialInterval);
+					runExist_hs.put(lF, true);
 				}
 
 			} else {
 
-				handler.removeCallbacks(run_hs.get(Const.l));
-				runExist_hs.put(Const.l, false);
+				handler.removeCallbacks(run_hs.get(l));
+				runExist_hs.put(l, false);
 			}
 
 			break;
 		case c:
 			if (bool) {
-				if (!(runExist_hs.get(Const.c))) {
-					handler.postDelayed(run_hs.get(Const.c),
+				if (!(runExist_hs.get(c))) {
+					handler.postDelayed(run_hs.get(c),
 							Vars.cybCheckInterval);
-					runExist_hs.put(Const.c, true);
+					runExist_hs.put(c, true);
 				}
 
 			} else {
-				handler.removeCallbacks(run_hs.get(Const.c));
-				runExist_hs.put(Const.c, false);
+				handler.removeCallbacks(run_hs.get(c));
+				runExist_hs.put(c, false);
 			}
 			break;
 		case net:
 			if (bool) {
-				if (!(runExist_hs.get(Const.net))) {
-					handler.postDelayed(run_hs.get(Const.net),
+				if (!(runExist_hs.get(net))) {
+					handler.postDelayed(run_hs.get(net),
 							Vars.netCheckInterval);
-					runExist_hs.put(Const.net, true);
+					runExist_hs.put(net, true);
 				}
 
 			} else {
 
-				handler.removeCallbacks(run_hs.get(Const.net));
-				runExist_hs.put(Const.net, false);
+				handler.removeCallbacks(run_hs.get(net));
+				runExist_hs.put(net, false);
 			}
 			break;
 		}
@@ -322,33 +330,33 @@ public class CybService extends Service {
 
 		switch (key) {
 		case wifi:
-			if (bool && !bcrExist_hs.get(Const.wifi)) {
-				registerReceiver(bcr_hs.get(Const.wifi), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-				bcrExist_hs.put(Const.wifi, true);
-			} else if (bcrExist_hs.get(Const.wifi)) {
-				unregisterReceiver(bcr_hs.get(Const.wifi));
-				bcrExist_hs.put(Const.wifi, false);
+			if (bool && !bcrExist_hs.get(wifi)) {
+				registerReceiver(bcr_hs.get(wifi), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+				bcrExist_hs.put(wifi, true);
+			} else if (bcrExist_hs.get(wifi)) {
+				unregisterReceiver(bcr_hs.get(wifi));
+				bcrExist_hs.put(wifi, false);
 			}
 			break;
 
 		case wifiLocha:
-			if (bool && !bcrExist_hs.get(Const.wifiLocha)) {
-				registerReceiver(bcr_hs.get(Const.wifiLocha), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-				bcrExist_hs.put(Const.wifiLocha, true);
-			} else if (bcrExist_hs.get(Const.wifiLocha)) {
-				unregisterReceiver(bcr_hs.get(Const.wifiLocha));
-				bcrExist_hs.put(Const.wifiLocha, false);
+			if (bool && !bcrExist_hs.get(wifiLocha)) {
+				registerReceiver(bcr_hs.get(wifiLocha), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+				bcrExist_hs.put(wifiLocha, true);
+			} else if (bcrExist_hs.get(wifiLocha)) {
+				unregisterReceiver(bcr_hs.get(wifiLocha));
+				bcrExist_hs.put(wifiLocha, false);
 			}
 			break;
 
 		case str:
-			if (bool && !bcrExist_hs.get(Const.str)) {
-				registerReceiver(bcr_hs.get(Const.str), new IntentFilter(
+			if (bool && !bcrExist_hs.get(str)) {
+				registerReceiver(bcr_hs.get(str), new IntentFilter(
 						WifiManager.RSSI_CHANGED_ACTION));
-				bcrExist_hs.put(Const.str, true);
-			} else if (bcrExist_hs.get(Const.str)) {
-				unregisterReceiver(bcr_hs.get(Const.str));
-				bcrExist_hs.put(Const.str, false);
+				bcrExist_hs.put(str, true);
+			} else if (bcrExist_hs.get(str)) {
+				unregisterReceiver(bcr_hs.get(str));
+				bcrExist_hs.put(str, false);
 			}
 			break;
 
@@ -366,26 +374,26 @@ public class CybService extends Service {
 			switch (command) {
 			case stop:
 			case wrongIdPwd:
-				if (!get(Const.isStopped)) {
-					set(Const.isStopped, true);
-					dispatch(Const.wifi, command);
+				if (!get(isStopped)) {
+					set(isStopped, true);
+					dispatch(wifi, command);
 				}
 				break;
 			case start:
 				Log.wtf("blah", "b");
-				if (!get(Const.isStopped)) {
-					dispatch(Const.wifi, command);
+				if (!get(isStopped)) {
+					dispatch(wifi, command);
 				}
 
 				break;
 			case restart:
-				dispatch(Const.top, Const.stop);
-				dispatch(Const.top, Const.start);
+				dispatch(top, stop);
+				dispatch(top, start);
 
 				break;
 			default:
-				if (!get(Const.isStopped)) {
-					dispatch(Const.wifi, command);
+				if (!get(isStopped)) {
+					dispatch(wifi, command);
 				}
 				break;
 			}
@@ -396,37 +404,37 @@ public class CybService extends Service {
 			// after getting ip address
 			switch (command){
 			case stop:
-				receiver(Const.wifi, false);
+				receiver(wifi, false);
 			case wifiConnected:
 			case wifiDisconnected:
-				dispatch(Const.net, command);
+				dispatch(net, command);
 				break;
 			case start:
-				if (check(Const.wifi)) {
-					set(Const.wifi,true);
-					receiver(Const.wifi, true);
-					dispatch(Const.net, command);
+				if (check(wifi)) {
+					set(wifi,true);
+					receiver(wifi, true);
+					dispatch(net, command);
 				} else
-					receiver(Const.wifi, true);
+					receiver(wifi, true);
 				
 				break;
 			case wifiKaLochaAaya:
-				receiver(Const.wifi, false);
-				receiver(Const.wifiLocha, true);
-				execute(Const.wifi, true);
+				receiver(wifi, false);
+				receiver(wifiLocha, true);
+				execute(wifi, true);
 				break;
 			case wifiKaLochaTheekKaro:
-				dispatch(Const.net, Const.wifiKaLochaTheekKaro);
-				receiver(Const.wifiLocha, false);
-				execute(Const.wifi,false);
-				set(Const.wifiForLocha,false);
-				receiver(Const.wifi, true);
+				dispatch(net, wifiKaLochaTheekKaro);
+				receiver(wifiLocha, false);
+				execute(wifi,false);
+				set(wifiForLocha,false);
+				receiver(wifi, true);
 				break;
 			case wifiKaBahotBadaLocha:
 				// don't know
 				break;
 			default:
-				dispatch(Const.net, command);
+				dispatch(net, command);
 				break;
 			}
 		}
@@ -438,48 +446,48 @@ public class CybService extends Service {
 			case strChange:
 			case reLogin:
 			case cybCheck:
-				dispatch(Const.str, command);
+				dispatch(str, command);
 				break;
 			case wifiDisconnected:
 			case wrongIdPwd:
 			case stop:
-				timer(Const.net, false);
-				set(Const.net, false);
-				dispatch(Const.str, command);
+				timer(net, false);
+				set(net, false);
+				dispatch(str, command);
 				break;
 			case wifiConnected:
 			case start:
-				timer(Const.net, true);
+				timer(net, true);
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
-					set(Const.net, true);
-					set(Const.cyberLess, true);
+					set(net, true);
+					set(cyberLess, true);
 					// inform that cyberless login or another wifi
 				} else {
-					dispatch(Const.str, command);
+					dispatch(str, command);
 				}
 				break;
 			case netCheck:
 				int retValue = Methods
 						.isConnectionAlive(getApplicationContext());
 				if (retValue == 1)
-					set(Const.net, true);
+					set(net, true);
 				else {
-					set(Const.net, false);
+					set(net, false);
 					switch (retValue) {
 					case 0:
-						dispatch(Const.net, Const.notLoggedIn);
+						dispatch(net, notLoggedIn);
 						break;
 					case 2:
-						dispatch(Const.str, Const.noNet);
+						dispatch(str, noNet);
 						break;
 					}
 				}
 				break;
 			case netRecheck:
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1)
-					set(Const.net, true);
+					set(net, true);
 				else {
-					set(Const.net, false);
+					set(net, false);
 					// notify logged in but no net
 				}
 				break;
@@ -493,44 +501,44 @@ public class CybService extends Service {
 			switch (command) {
 			case noNet:
 			case notLoggedIn:
-				set(Const.str, check(Const.str));
+				set(str, check(str));
 				break;
 
 			case wifiKaLochaTheekKaro:
-				dispatch(Const.c, command);
+				dispatch(c, command);
 				return;
 			case wifiConnected:
 			case start:
-				if (check(Const.str)) {
-					set(Const.str, true);
-					receiver(Const.str, true);
-					dispatch(Const.c, command);
+				if (check(str)) {
+					set(str, true);
+					receiver(str, true);
+					dispatch(c, command);
 				} else {
-					receiver(Const.str, true);
+					receiver(str, true);
 				}
 				return;
 			case wifiDisconnected:
 			case wrongIdPwd:
 			case stop:
-				receiver(Const.str, false);
-				dispatch(Const.c, command);
+				receiver(str, false);
+				dispatch(c, command);
 				return;
 			case strChange:
-				if (get(Const.str)) {
-					dispatch(Const.c, Const.highSTR);
+				if (get(str)) {
+					dispatch(c, highSTR);
 				} else {
-					dispatch(Const.c, Const.lowSTR);
+					dispatch(c, lowSTR);
 				}
 				return;
 			}
 
-			if (get(Const.str)) {
+			if (get(str)) {
 				switch (command) {
 				case cybCheck:
 				case reLogin:
 				case noNet:
 				case notLoggedIn:
-					dispatch(Const.c, command);
+					dispatch(c, command);
 					break;
 				default:
 					// locha
@@ -539,34 +547,34 @@ public class CybService extends Service {
 			break;
 
 		case c: {
-			if (check(Const.c)) {
-				timer(Const.c, false);
+			if (check(c)) {
+				timer(c, false);
 
-				if (!get(Const.c))
-					set(Const.c, true);
+				if (!get(c))
+					set(c, true);
 
 				switch (command) {
 				case stop:
-					set(Const.c, false);
-					dispatch(Const.l, command);
+					set(c, false);
+					dispatch(l, command);
 					break;
 				case wifiKaLochaTheekKaro:
-					dispatch(Const.l, Const.wifiKaLochaTheekKaro);
-					set(Const.c, false);
+					dispatch(l, wifiKaLochaTheekKaro);
+					set(c, false);
 					break;
 				case wrongIdPwd:
 					break;
 				default:
-					dispatch(Const.l, command);
+					dispatch(l, command);
 					break;
 				}
 			} else {
 				switch (command) {
 				case wifiDisconnected:
 				case stop:
-					set(Const.c, false);
-					timer(Const.c, false);
-					dispatch(Const.l, command);
+					set(c, false);
+					timer(c, false);
+					dispatch(l, command);
 					break;
 
 				case noNet:
@@ -575,23 +583,23 @@ public class CybService extends Service {
 				case start:
 				case highSTR:
 				case reLogin:
-					timer(Const.c, true);
+					timer(c, true);
 					break;
 
 				case lowSTR:
 				case wifiKaLochaTheekKaro:
-					dispatch(Const.top, Const.wifiKaBahotBadaLocha);
-					timer(Const.c, false);
+					dispatch(top, wifiKaBahotBadaLocha);
+					timer(c, false);
 					break;
 
 				default:
-					timer(Const.c, false);
+					timer(c, false);
 					break;
 				}
 
-				if (get(Const.c)) {
-					dispatch(Const.l, Const.noCyb);
-					set(Const.c, false);
+				if (get(c)) {
+					dispatch(l, noCyb);
+					set(c, false);
 				}
 
 			}
@@ -599,47 +607,47 @@ public class CybService extends Service {
 			break; // C over
 
 		case l: {
-			timer(Const.l, false);
+			timer(l, false);
 			switch (command) {
 			case noCyb:
-				if (get(Const.l))
+				if (get(l))
 					// big locha
-					set(Const.l, false);
+					set(l, false);
 				break;
 			case lowSTR:
-				if (get(Const.l)) {
+				if (get(l)) {
 					Methods.attemptLogout(getApplicationContext(), Vars.loginId,
 							Vars.password);
-					set(Const.l, false);
+					set(l, false);
 				}
 				break;
 
 			case notLoggedIn:
-				set(Const.l, false);
+				set(l, false);
 			case highSTR:
 			case cybCheck:
 			case reLogin:
 			case wifiConnected:
 			case noNet:
 			case start:
-				if ((get(Const.l)) && (command != Const.reLogin)) {
-					if (command == Const.noNet) {
+				if ((get(l)) && (command != reLogin)) {
+					if (command == noNet) {
 						// inform that logged in but still no net
 					}
 				} else {
 					Const reason = Methods.attemptLogin(getApplicationContext());
-					if (reason == Const.loggedIn) {
-						set(Const.l, true);
-						timer(Const.l, true);
-						dispatch(Const.top, Const.netRecheck);
+					if (reason == loggedIn) {
+						set(l, true);
+						timer(l, true);
+						dispatch(top, netRecheck);
 					} else {
-						set(Const.l, false);
+						set(l, false);
 						switch (reason) {
 						case maxLogin:
-							timer(Const.lF, true);
+							timer(lF, true);
 							break;
 						case wrongIdPwd:
-							dispatch(Const.top, Const.wrongIdPwd);
+							dispatch(top, wrongIdPwd);
 							break;
 						default:
 							// todo stop timer and receivers until user id
@@ -652,15 +660,15 @@ public class CybService extends Service {
 
 			case wifiKaLochaTheekKaro:
 			case stop:
-				if (get(Const.l))
+				if (get(l))
 					Methods.attemptLogout(getApplicationContext(), Vars.loginId,
 							Vars.password);
-				set(Const.l, false);
+				set(l, false);
 				break;
 
 			case wifiDisconnected:
-				if (get(Const.l))
-					dispatch(Const.top, Const.wifiKaLochaAaya);
+				if (get(l))
+					dispatch(top, wifiKaLochaAaya);
 				break;
 			default:
 				break;
@@ -681,7 +689,7 @@ public class CybService extends Service {
 
 		StrictMode.setThreadPolicy(policy);
 		init();
-		dispatch(Const.top, Const.start);
+		dispatch(top, start);
 
 	}
 
@@ -690,23 +698,25 @@ public class CybService extends Service {
 		// TODO Auto-generated method stub
 		super.onLowMemory();
 		Log.wtf("WTF","lowMemory");
-		dispatch(Const.top, Const.stop);
+		dispatch(top, stop);
 	}
 
+	/*
 	@Override
 	public void onTrimMemory(int level) {
 		// TODO Auto-generated method stub
 		super.onTrimMemory(level);
 		Log.wtf("WTF","trimMemory");
-		dispatch(Const.top, Const.stop);
+		dispatch(top, stop);
 	}
-
+	*/
+	
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		Log.wtf("WTF","destroy");
-		dispatch(Const.top, Const.stop);
+		dispatch(top, stop);
 	}
 
 	@Override
