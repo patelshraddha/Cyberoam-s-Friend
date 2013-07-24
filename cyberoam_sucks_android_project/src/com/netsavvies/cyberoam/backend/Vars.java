@@ -25,6 +25,7 @@ public class Vars {
 	static boolean isloggedIn;
 	static String password;
 
+	
 	// bools
 	/*
 	static boolean isAutoLoginAfterIntervalOn;

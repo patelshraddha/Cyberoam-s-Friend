@@ -59,5 +59,5 @@ public enum Const {
 	
 
 	// other variables
-	
+	noUser;
 }

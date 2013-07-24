@@ -1,31 +1,13 @@
-/*
- * Copyright (C) 2010 Eric Harlow
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.netsavvies.cyberoam.gui.dragNdrop;
 
 import java.util.ArrayList;
-import android.content.DialogInterface;
-import com.netsavvies.cyberoam.R;
-import com.netsavvies.cyberoam.backend.DatabaseHandler;
-import com.netsavvies.cyberoam.backend.UserDetails;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,24 +20,37 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.netsavvies.cyberoam.R;
+import com.netsavvies.cyberoam.backend.Control;
+import com.netsavvies.cyberoam.backend.DatabaseHandler;
+import com.netsavvies.cyberoam.backend.UserDetails;
+
 public class DragNDropListActivity extends ListActivity {
 
 	private ArrayList<UserDetails> users;
 	private ArrayList<String> content;
 	private ArrayList<Boolean> checkboxcontent;
 	private DragNDropAdapter adapter;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		//if(Control.isServiceRunning(this)==false)
+		//{
+		Toast.makeText(this,"HERE",Toast.LENGTH_SHORT).show();
+		Intent startServiceIntent = new Intent(this, com.netsavvies.cyberoam.backend.CybService.class);
+        startService(startServiceIntent);
+        
+        Toast.makeText(this,"Service started by login activity",Toast.LENGTH_SHORT).show();
+		//}
 		setContentView(R.layout.dragndroplistview);
 
-		
 		content = new ArrayList<String>();
 		checkboxcontent = new ArrayList<Boolean>();
 		construct();
-		adapter=new DragNDropAdapter(this,new int[] { R.layout.dragitem }, new int[] { R.id.TextView01 },
-				new int[] { R.id.checkBox },new int[] { R.id.deleteuser } ,content, checkboxcontent);
+		adapter = new DragNDropAdapter(this, new int[] { R.layout.dragitem },
+				new int[] { R.id.TextView01 }, new int[] { R.id.checkBox },
+				new int[] { R.id.deleteuser }, content, checkboxcontent);
 		setListAdapter(adapter);
 		ListView listView = getListView();
 
@@ -92,7 +87,6 @@ public class DragNDropListActivity extends ListActivity {
 		int defaultBackgroundColor;
 
 		public void onDrag(int x, int y, ListView listView) {
-			// TODO Auto-generated method stub
 		}
 
 		public void onStartDrag(View itemView) {
@@ -116,19 +110,14 @@ public class DragNDropListActivity extends ListActivity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-
 		MenuInflater inflater = getMenuInflater();
-
 		inflater.inflate(R.menu.login, menu);
 		return true;
-
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-
 		switch (item.getItemId()) {
-
 		case R.id.settings:
 			addUser();
 			return true;
@@ -142,18 +131,18 @@ public class DragNDropListActivity extends ListActivity {
 	}
 
 	private void deleteallUsers() {
-		final Context context=this;
+		final Context context = this;
 		AlertDialog.Builder alertbuilder = new AlertDialog.Builder(context);
-		String message="Are you sure you want to delete all the users?";
+		String message = "Are you sure you want to delete all the users?";
 		alertbuilder
 				.setTitle("OOPS!!!")
 				.setMessage(message)
 				.setCancelable(false)
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
-							public void onClick(
-									DialogInterface dialog, int id) {
-								DatabaseHandler db = new DatabaseHandler(context);
+							public void onClick(DialogInterface dialog, int id) {
+								DatabaseHandler db = new DatabaseHandler(
+										context);
 								db.deleteAllUsers();
 								db.close();
 								content.clear();
@@ -162,17 +151,15 @@ public class DragNDropListActivity extends ListActivity {
 								dialog.cancel();
 							}
 						})
-			   .setNegativeButton("No",
-						new DialogInterface.OnClickListener() {
-					public void onClick(
-							DialogInterface dialog, int id) {
-						
+				.setNegativeButton("No", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+
 						dialog.cancel();
 					}
 				});
 		AlertDialog alert = alertbuilder.create();
 		alert.show();
-		
+
 	}
 
 	private void addUser() {
@@ -195,12 +182,11 @@ public class DragNDropListActivity extends ListActivity {
 				if ((userPassword.getText().length() == 0)
 						|| (userId.getText().length() == 0)) {
 					String message = null;
-					
-						
-					if((userPassword.getText().length() == 0)
-						&& (userId.getText().length() == 0))
-						message="Empty password and empty UserId";
-					else if(userPassword.getText().length() != 0)
+
+					if ((userPassword.getText().length() == 0)
+							&& (userId.getText().length() == 0))
+						message = "Empty password and empty UserId";
+					else if (userPassword.getText().length() != 0)
 						message = "Empty User Id";
 					else
 						message = "Empty password";
@@ -220,11 +206,10 @@ public class DragNDropListActivity extends ListActivity {
 					AlertDialog alert = alertbuilder.create();
 					alert.show();
 
-				}
-				else
-				{
+				} else {
 					DatabaseHandler db = new DatabaseHandler(context);
-					db.addUser(new UserDetails(1000,userId.getText().toString(),userPassword.getText().toString(),1));
+					db.addUser(new UserDetails(1000, userId.getText()
+							.toString(), userPassword.getText().toString(), 1));
 					content.add(db.getUser(db.getUsersCount()).getId());
 					Boolean checked;
 					if (db.getUser(db.getUsersCount()).getChecked() == 1)
@@ -232,8 +217,10 @@ public class DragNDropListActivity extends ListActivity {
 					else
 						checked = false;
 					checkboxcontent.add(checked);
-					db.close();
 					
+					
+					db.close();
+
 					adapter.notifyDataSetChanged();
 					dialog.dismiss();
 				}
@@ -248,12 +235,11 @@ public class DragNDropListActivity extends ListActivity {
 		});
 
 	}
-	
-	private void construct()
-	{
+
+	private void construct() {
 		DatabaseHandler db = new DatabaseHandler(this);
 		users = db.getAllUsers();
-        for (int i = 0; i < users.size(); i++) {
+		for (int i = 0; i < users.size(); i++) {
 			content.add(users.get(i).getId());
 			Boolean checked;
 			if (users.get(i).getChecked() == 1)
@@ -262,9 +248,8 @@ public class DragNDropListActivity extends ListActivity {
 				checked = false;
 			checkboxcontent.add(checked);
 		}
-		
+
 		db.close();
 	}
- 
-	 
+
 }

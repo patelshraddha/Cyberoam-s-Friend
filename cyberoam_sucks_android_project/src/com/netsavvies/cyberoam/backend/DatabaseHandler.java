@@ -1,41 +1,30 @@
 package com.netsavvies.cyberoam.backend;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 
-	// All Static variables
-	// Database Version
 	private static final int DATABASE_VERSION = 1;
 
-	// Database Name
 	private static final String DATABASE_NAME = "DetailsManager";
 
-	// Contacts table name
 	private static final String TABLE_DETAILS = "UserDetails";
 
-	// Contacts Table Columns names
 	private static final String KEY_PRIORITY = "priority";
 	private static final String KEY_ID = "id";
 	private static final String KEY_PASSWORD = "password";
 	private static final String KEY_CHECKED = "checked";
 
-	private static DatabaseHandler mInstance = null;
-
 	public DatabaseHandler(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
 
-	// Creating Tables
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		String CREATE_DETAILS_TABLE = "CREATE TABLE " + TABLE_DETAILS + "("
@@ -44,66 +33,46 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.execSQL(CREATE_DETAILS_TABLE);
 	}
 
-	// Upgrading database
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		// Drop older table if existed
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_DETAILS);
-
-		// Create tables again
 		onCreate(db);
 	}
 
-	/**
-	 * All CRUD(Create, Read, Update, Delete) Operations
-	 */
-
-	// Adding new user
 	public void addUser(UserDetails userDetails) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		userDetails.setPriority(this.getUsersCount() + 1);
 		values.put(KEY_PRIORITY, userDetails.getPriority());
-		values.put(KEY_ID, userDetails.getId()); // user id
-		values.put(KEY_PASSWORD, userDetails.getPassword()); // Contact password
+		values.put(KEY_ID, userDetails.getId());
+		values.put(KEY_PASSWORD, userDetails.getPassword());
 		values.put(KEY_CHECKED, userDetails.getChecked());
-
 		db.replace(TABLE_DETAILS, null, values);
-		// Inserting Row
-
-		db.close(); // Closing database connection
+		db.close();
 	}
 
 	// Getting single contact
 	public UserDetails getUser(int priority) {
 		SQLiteDatabase db = this.getReadableDatabase();
-
 		Cursor cursor = db.query(TABLE_DETAILS, new String[] { KEY_PRIORITY,
 				KEY_ID, KEY_PASSWORD, KEY_CHECKED }, KEY_PRIORITY + "=?",
 				new String[] { String.valueOf(priority) }, null, null, null,
 				null);
 		if (cursor != null)
 			cursor.moveToFirst();
-
 		UserDetails userDetails = new UserDetails(Integer.parseInt(cursor
 				.getString(0)), cursor.getString(1), cursor.getString(2),
 				Integer.parseInt(cursor.getString(3)));
 		cursor.close();
 		db.close();
-
 		return userDetails;
 	}
 
-	// Getting All Contacts
 	public ArrayList<UserDetails> getAllUsers() {
 		ArrayList<UserDetails> userList = new ArrayList<UserDetails>();
-		// Selec All Query
 		String selectQuery = "SELECT  * FROM " + TABLE_DETAILS;
-
 		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
 				UserDetails userDetails = new UserDetails();
@@ -112,7 +81,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				userDetails.setId(cursor.getString(1));
 				userDetails.setPassword(cursor.getString(2));
 				userDetails.setChecked(Integer.parseInt(cursor.getString(3))); // Adding
-				// contact to list
 				userList.add(userDetails);
 			} while (cursor.moveToNext());
 		}
@@ -138,14 +106,9 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	// Getting All Contacts
 	public void deleteAllUsers() {
-		
-		
 		String selectQuery = "SELECT  * FROM " + TABLE_DETAILS;
-
 		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
 
@@ -154,27 +117,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 			} while (cursor.moveToNext());
 		}
-
 		cursor.close();
 		db.close();
-		
-
 	}
 
 	// Updating single contact
 	public void updatePriority(UserDetails userDetails, int i) {
 		SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-		values.put(KEY_PRIORITY,i);
-		int r = db.update(TABLE_DETAILS, values, KEY_PRIORITY + "="+userDetails.getPriority(),null);
+		ContentValues values = new ContentValues();
+		values.put(KEY_PRIORITY, i);
+		db.update(TABLE_DETAILS, values, KEY_PRIORITY + "="
+				+ userDetails.getPriority(), null);
 		db.close();
 	}
-	
+
 	public void updateChecked(UserDetails userDetails, int i) {
 		SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-		values.put(KEY_CHECKED,i);
-		int r = db.update(TABLE_DETAILS, values, KEY_PRIORITY + "="+userDetails.getPriority(),null);
+		ContentValues values = new ContentValues();
+		values.put(KEY_CHECKED, i);
+		db.update(TABLE_DETAILS, values, KEY_PRIORITY + "="
+				+ userDetails.getPriority(), null);
 		db.close();
 	}
 
@@ -184,22 +146,18 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		db.delete(TABLE_DETAILS, KEY_PRIORITY + " = ?",
 				new String[] { String.valueOf(priority) });
 		db.close();
-		int i=0;
-		for(i=priority+1;i<=getUsersCount()+1;i++)
-		updatePriority(getUser(i),i-1);
-			
+		int i = 0;
+		for (i = priority + 1; i <= getUsersCount() + 1; i++)
+			updatePriority(getUser(i), i - 1);
+
 	}
 
 	// Getting contacts Count
 	public int getUsersCount() {
-		int size=0;
-		// Selec All Query
+		int size = 0;
 		String selectQuery = "SELECT  * FROM " + TABLE_DETAILS;
-
 		SQLiteDatabase db = this.getWritableDatabase();
 		Cursor cursor = db.rawQuery(selectQuery, null);
-
-		// looping through all rows and adding to list
 		if (cursor.moveToFirst()) {
 			do {
 				size++;

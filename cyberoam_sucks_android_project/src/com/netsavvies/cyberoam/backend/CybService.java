@@ -360,12 +360,14 @@ public class CybService extends Service {
 
 	private void dispatch(Const level, Const command) {
 		Log.wtf("dispatch", level.name() + " " + command.name());
-
+		Toast.makeText(getApplicationContext(),level+"   "+command,Toast.LENGTH_SHORT).show();
 		switch (level) {
 		case top:
 			switch (command) {
-			case stop:
+			
 			case wrongIdPwd:
+				
+			case stop:
 				if (!get(Const.isStopped)) {
 					set(Const.isStopped, true);
 					dispatch(Const.wifi, command);
@@ -406,9 +408,10 @@ public class CybService extends Service {
 					set(Const.wifi,true);
 					receiver(Const.wifi, true);
 					dispatch(Const.net, command);
+					
 				} else
 					receiver(Const.wifi, true);
-				
+				    //TODO Notification- no wifi
 				break;
 			case wifiKaLochaAaya:
 				receiver(Const.wifi, false);
@@ -453,7 +456,7 @@ public class CybService extends Service {
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
 					set(Const.net, true);
 					set(Const.cyberLess, true);
-					// inform that cyberless login or another wifi
+					// TODO cyberless or by another wifi or may be data connection
 				} else {
 					dispatch(Const.str, command);
 				}
@@ -507,6 +510,7 @@ public class CybService extends Service {
 					dispatch(Const.c, command);
 				} else {
 					receiver(Const.str, true);
+					//TODO not proper strength
 				}
 				return;
 			case wifiDisconnected:
@@ -576,6 +580,7 @@ public class CybService extends Service {
 				case highSTR:
 				case reLogin:
 					timer(Const.c, true);
+					//TODO no cyberoam
 					break;
 
 				case lowSTR:
@@ -624,7 +629,7 @@ public class CybService extends Service {
 			case start:
 				if ((get(Const.l)) && (command != Const.reLogin)) {
 					if (command == Const.noNet) {
-						// inform that logged in but still no net
+						//TODO inform that logged in but still no net
 					}
 				} else {
 					Const reason = Methods.attemptLogin(getApplicationContext());
@@ -637,11 +642,14 @@ public class CybService extends Service {
 						switch (reason) {
 						case maxLogin:
 							timer(Const.lF, true);
+							//TODO maxlogin
 							break;
 						case wrongIdPwd:
 							dispatch(Const.top, Const.wrongIdPwd);
 							break;
-						default:
+						case noUser:
+							//TODO notify no user clicking on notification will start login activity with button of listactivty
+							//timer();
 							// todo stop timer and receivers until user id
 							// received
 						}

@@ -29,14 +29,16 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.util.Log;
+import android.widget.Toast;
 
 class Methods {
-
+    private static ArrayList<UserDetails>data;
+	
+	
 	static boolean isCyberoamAvailbale(Context context) {
 		if (!isWifiConnected(context))
 			return false;
@@ -60,8 +62,6 @@ class Methods {
 	}
 
 	static boolean isWifiConnected(Context context) {
-		
-		// TODO Auto-generated method stub
 		ConnectivityManager connManager = (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo mWifi = connManager
@@ -174,49 +174,59 @@ class Methods {
 	
 	public static void attemptLogout(Context context, String loginid,	String loginpassword) {
 		Log.wtf("logoutMsg", contactServer("193", loginid, loginpassword, context));
+		Vars.isloggedIn=false;
 
 	}
 	private static String getloginId(int i) {
-		/*SharedPreferences settings = getApplicationContext()
-				.getSharedPreferences("user_details", 0);
-		String user = settings.getString("user" + i, null);
-		return user;*/
-		return "200901146";
+		if(i>data.size()-1)
+			return null;
+		else
+			return data.get(i).getId();
 	}
 	private static String getloginPassword(int i) {
-		/*SharedPreferences settings = getApplicationContext()
-				.getSharedPreferences("user_details", 0);
-		String password = settings.getString("password" + i, null);*/
-		return "reset123";
+		return data.get(i).getPassword();
 	}
 	public static Const attemptLogin(Context context) {
-		int i = 1;
-		int maxLogin = 0;
-
+		int i = 0;
 		String message;
-		// while (getloginId(i) != null) {
+		//get all the users in one go and store them.
+		DatabaseHandler db = new DatabaseHandler(context);
+		data=db.getAllUsers();
+		db.close();
+		if(data.size()==0)
+			return Const.noUser;
+		
+		while (getloginId(i) != null) {
+			if(getChecked(i))
+			{
 		message = contactServer("191", getloginId(i), getloginPassword(i),
 				context);
+		Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
 		Log.wtf("loginMsg", message);
-		if (message.equals("You have successfully logged in")
-				|| message
-						.equals("You are already logged in as a clientless user")) {
-			// Static.isloggedIn = true;
+		if (message.equals("You have successfully logged in")) {
+			Vars.isloggedIn = true;
 			Vars.loginId = getloginId(i);
 			Vars.password = getloginPassword(i);
 			return Const.loggedIn;
-			// break;
+			
 		}
-		/*	else if(message.equals("You have reached the maximum login limit"))
-				maxLogin+=1;
-			else if()
-			i++;*/
-		else
-			return Const.maxLogin;
+		else if(message.equals("You are already logged in as a clientless user"))
+			return Const.cyberLess;
+			}
+		i++;
+		 } 
+		return Const.maxLogin;
 
 	}
 	
 	
+	private static boolean getChecked(int i) {
+		if(data.get(i).getChecked()==1)
+		return  true;
+		else
+		return false;
+	}
+
 	public static String contactServer(String loginmode, String loginid,
 			String loginpassword, Context context) {
 		String url = Vars.url;
@@ -229,8 +239,7 @@ class Methods {
 		nvps.add(new BasicNameValuePair("password", loginpassword));
 		try {
 			client.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-		} catch (UnsupportedEncodingException e) { // TODO Auto-generated catch
-													// block
+		} catch (UnsupportedEncodingException e) { 
 			e.printStackTrace();
 		}
 		try {
@@ -252,15 +261,15 @@ class Methods {
 				}
 
 			}
-		} catch (ClientProtocolException e) { // TODO Auto-generated catch block
+		} catch (ClientProtocolException e) { 
 			e.printStackTrace();
-		} catch (IOException e) { // TODO Auto-generated catch block
+		} catch (IOException e) { 
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		} catch (SAXException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
 		}
 		return message;
