@@ -15,8 +15,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.StrictMode;
 import android.os.SystemClock;
 import android.util.Log;
@@ -28,6 +30,25 @@ import static com.netsavvies.cyberoam.backend.Methods.*;
 public class CybService extends Service {
 
 	int connection;
+	
+	private Handler theHandler = new Handler(){
+
+		protected void finalize(){
+			dispatch(top,stop);
+		}
+		
+		@Override
+		public void handleMessage(Message msg) {
+			Const constMsg = Const.valueOf(msg.getData().getString(("Const")));
+			if(constMsg == init){
+				init();
+			}
+			else{
+				dispatch(top,constMsg);
+			}
+			super.handleMessage(msg);
+		}
+	}; // the thread handling all the actual operations
 
 	private BroadcastReceiver receiversForCybService;
 	// all events
@@ -55,7 +76,7 @@ public class CybService extends Service {
 		set(l, false);
 		set(str, false);
 		set(wifi, false);
-		set(isStopped, false);
+		set(isHalted, false);
 		set(cyberLess, false);
 		*/
 		
@@ -177,16 +198,13 @@ public class CybService extends Service {
 		bcrExist_hs.put(wifiLocha, false);
 		bcrExist_hs.put(str, false);
 		
-		
-		//noti 
-		updateGuiStatus();
 	}
-	
+	/*
 	private void updateGuiStatus(){
 		String txt= "W:"+gettf(wifi)+" N:"+gettf(net)+" S:"+gettf(str)+" C:"+gettf(c)+" L:"+gettf(l);
 		InformGui.Notify(txt, this);
 	}
-	
+	*/
 	
 
 	private boolean check(Const key) {
@@ -325,17 +343,25 @@ public class CybService extends Service {
 		case top:
 			switch (command) {
 			
+			case disable:
+				set(isDisabled, true);
+				command = stop;
 			case wrongIdPwd:
 			case stop:
-				if (!get(Const.isStopped)) {
-					set(Const.isStopped, true);
-					dispatch(Const.wifi, command);
+				if (get(isRunning)) {
+					set(isRunning, false);
+					dispatch(wifi, command);
 				}
 				break;
+			case enable:
+				set(isDisabled, false);
+				command = start;
 			case start:
-				Log.wtf("blah", "b");
-				if (!get(isStopped)) {
+				if (!get(isRunning) && !get(isDisabled)) {
+					set(isRunning,true);
 					dispatch(wifi, command);
+				} else {
+					Log.wtf("service", "halted or running service can't start");
 				}
 
 				break;
@@ -345,7 +371,7 @@ public class CybService extends Service {
 
 				break;
 			default:
-				if (!get(isStopped)) {
+				if (get(isRunning)) {
 					dispatch(wifi, command);
 				}
 				break;
@@ -636,19 +662,18 @@ public class CybService extends Service {
 			break;
 		}
 	}
+	
+	@Override
+	public IBinder onBind(Intent intent) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public void onCreate() {
-		// TODO Auto-generated method stub
+		theHandler.handleMessage(constructHandlerMessage(init));
+		
 		super.onCreate();
-
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-				.permitAll().build();
-
-		StrictMode.setThreadPolicy(policy);
-		init();
-		dispatch(top, start);
-
 	}
 
 	@Override
@@ -656,7 +681,7 @@ public class CybService extends Service {
 		// TODO Auto-generated method stub
 		super.onLowMemory();
 		Log.wtf("WTF","lowMemory");
-		dispatch(top, stop);
+		theHandler.handleMessage(constructHandlerMessage(stop));
 	}
 
 	/*
@@ -669,66 +694,31 @@ public class CybService extends Service {
 	}
 	*/
 	
+	
+	
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 		Log.wtf("WTF","destroy");
-		dispatch(top, stop);
+		theHandler.handleMessage(constructHandlerMessage(stop));
 	}
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		// TODO Auto-generated method stub
-		// String action = intent.getStringExtra("action");
 		Vars.isloggedIn = false;
 		Vars.loginId = null;
 		
-		// Build notification
-		// Actions are just fake
+		/*
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
 
-		// Stop the activity if rebooted.
-		/*
-		 * if (action == "android.intent.action.BOOT_COMPLETED")
-		 * InformGui.Notify("Boot completed", getApplicationContext());
-		 */
-		/*
-		 * connection = Static.getConnectivityStatus(getApplicationContext());
-		 * if (connection == 0) InformGui.Notify("No data connection available",
-		 * getApplicationContext()); else if (connection == 2) {
-		 * InformGui.Notify("Using Data connection", getApplicationContext());
-		 * Toast.makeText(getApplicationContext(), "Using Data connection",
-		 * Toast.LENGTH_SHORT).show();// mobile connection } else { if
-		 * (Static.isCyberoamAvailbale()) { if (attemptLogin()) {
-		 * InformGui.Notify("Logged in by " + Static.loginId,
-		 * getApplicationContext()); InformGui.loggedIn(getApplicationContext(),
-		 * Static.loginId); timer.schedule(task, Static.loginInterval,
-		 * Static.loginInterval); } else { InformGui.Notify("Logged failed",
-		 * getApplicationContext());
-		 * InformGui.loginFailed(getApplicationContext()); } } else { // using
-		 * some other wifi or because the wifi strength is less
-		 * InformGui.Notify("Supreme can't be reached",
-		 * getApplicationContext()); } }
-		 */
-		// Static.receiverContext=getApplicationContext();
+		StrictMode.setThreadPolicy(policy);
+		*/
+		
+		theHandler.handleMessage(constructHandlerMessage(start));
 		return super.onStartCommand(intent, flags, startId);
 
 	}
-
 	
-
-	
-
-	
-
-	
-
-	
-
 }

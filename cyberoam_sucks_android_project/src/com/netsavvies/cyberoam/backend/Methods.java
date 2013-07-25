@@ -35,6 +35,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -354,4 +356,13 @@ class Methods {
 		return message;
 	}
 
+	public static Message constructHandlerMessage(Const cnt){
+		Bundle bundle = new Bundle();
+		bundle.putString("Const", cnt.name());
+		
+		Message msg = new Message();
+		msg.setData(bundle);
+		return msg;
+		
+	}
 }
