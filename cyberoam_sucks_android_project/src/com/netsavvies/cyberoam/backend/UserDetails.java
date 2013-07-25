@@ -3,11 +3,13 @@ package com.netsavvies.cyberoam.backend;
 public class UserDetails {
 
 	// private variables
-	int _priority;
-	String _id;
-	String _password;
-	int _checked;
-
+	private int _priority;
+	private String _id;
+	private String _password;
+	private int _checked;
+	private Const _loginStatus;
+    
+    
 	// Empty constructor
 	public UserDetails() {
 
@@ -34,9 +36,20 @@ public class UserDetails {
 	}
 
 	// setting priority
-	public void setPriority(int _priority) {
-		this._priority = _priority;
+	public void setStatus(Const status) {
+		this._loginStatus =status;
 	}
+	
+	   // getting login status
+		public Const getStatus() {
+			return this._loginStatus;
+		}
+
+		// setting login status
+		public void setPriority(int _priority) {
+			this._priority = _priority;
+		}
+	
 
 	// getting id
 	public String getId() {

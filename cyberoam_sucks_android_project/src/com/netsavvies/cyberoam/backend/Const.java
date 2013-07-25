@@ -59,5 +59,14 @@ public enum Const {
 	
 
 	// other variables
-	noUser;
+	noUser,
+	notChecked,
+	
+	
+	//messages
+	
+	
+	
+	
+	
 }

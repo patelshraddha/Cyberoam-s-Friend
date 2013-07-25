@@ -18,9 +18,12 @@ import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.StrictMode;
+import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Toast;
 import static com.netsavvies.cyberoam.backend.Const.*;
+import static com.netsavvies.cyberoam.backend.Vars.*;
+import static com.netsavvies.cyberoam.backend.Methods.*;
 
 public class CybService extends Service {
 
@@ -29,7 +32,6 @@ public class CybService extends Service {
 	private BroadcastReceiver receiversForCybService;
 	// all events
 	// all states
-	private Hashtable<Const, Boolean> bool_hs;
 	private Handler handler;
 	private Hashtable<Const, Runnable> run_hs;
 	private Hashtable<Const, Boolean> runExist_hs;
@@ -41,7 +43,6 @@ public class CybService extends Service {
 
 	private void init() {
 
-		bool_hs = new Hashtable<Const, Boolean>();
 		run_hs = new Hashtable<Const, Runnable>();
 		runExist_hs = new Hashtable<Const, Boolean>();
 		bcr_hs = new Hashtable<Const, BroadcastReceiver>();
@@ -87,7 +88,6 @@ public class CybService extends Service {
 
 				dispatch(top, reLogin);
 			}
-
 		});
 
 		run_hs.put(net, new Runnable() {
@@ -136,6 +136,7 @@ public class CybService extends Service {
 				}
 			}
 		});
+		
 		bcr_hs.put(wifiLocha, new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
@@ -178,65 +179,15 @@ public class CybService extends Service {
 		
 		
 		//noti 
-		updateNotification();
-
+		updateGuiStatus();
 	}
-
-	private void execute(Const key, boolean bool) {
-		Log.wtf("Execute", key.name() + " " + bool);
-		switch (key) {
-		case wifi:
-			Methods.turnWifi(this, bool);
-
-		}
-	}
-
-	private void updateNotification(){
+	
+	private void updateGuiStatus(){
 		String txt= "W:"+gettf(wifi)+" N:"+gettf(net)+" S:"+gettf(str)+" C:"+gettf(c)+" L:"+gettf(l);
 		InformGui.Notify(txt, this);
 	}
 	
-	private void set(Const key, Boolean bool) {
-		Log.wtf("set", key.name() + " " + bool);
-		bool_hs.put(key, bool);
-		updateNotification();
-	}
-
-	private boolean get(Const key) {
-		if (getNoLog(key)) {
-			Log.wtf("get", key.name() + " true");
-			return true;
-		} else {
-			Log.wtf("get", key.name() + " false");
-			return false;
-		}
-	}
 	
-	private boolean getNoLog(Const key) {
-
-		if (bool_hs.containsKey(key)) {
-			return bool_hs.get(key);
-		} else {
-			bool_hs.put(key, false);
-			return false;
-		}
-
-	}
-	
-	
-	private char getTF(Const key){
-		if(getNoLog(key)) 
-			return 'T';
-		else 
-			return 'F';
-	}
-	
-	private char gettf(Const key){
-		if(getNoLog(key)) 
-			return 't';
-		else 
-			return 'f';
-	}
 
 	private boolean check(Const key) {
 		boolean result = false;
@@ -422,12 +373,13 @@ public class CybService extends Service {
 			case wifiKaLochaAaya:
 				receiver(wifi, false);
 				receiver(wifiLocha, true);
-				execute(wifi, true);
+				execute(wifi, true,this);
 				break;
 			case wifiKaLochaTheekKaro:
+				//SystemClock.sleep(1000);
 				dispatch(net, wifiKaLochaTheekKaro);
 				receiver(wifiLocha, false);
-				execute(wifi,false);
+				execute(wifi,false,this);
 				set(wifiForLocha,false);
 				receiver(wifi, true);
 				break;
@@ -460,8 +412,8 @@ public class CybService extends Service {
 			case start:
 				timer(net, true);
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
-					set(net, true);
 					set(cyberLess, true);
+					set(net, true);
 					// inform that cyberless login or another wifi
 				} else {
 					dispatch(str, command);
@@ -515,14 +467,16 @@ public class CybService extends Service {
 					receiver(str, true);
 					dispatch(c, command);
 				} else {
-
+					
 					receiver(str, true);
 				}
 				return;
-			case wifiDisconnected:
-			case wrongIdPwd:
+			
 			case stop:
-				receiver(str, false);
+			case wifiDisconnected:
+				set(str,false);
+			case wrongIdPwd:
+			    receiver(str, false);
 				dispatch(c, command);
 				return;
 			case strChange:
@@ -601,7 +555,7 @@ public class CybService extends Service {
 
 				if (get(c)) {
 					dispatch(l, noCyb);
-					set(c, false);
+					
 				}
 
 			}
@@ -610,6 +564,7 @@ public class CybService extends Service {
 
 		case l: {
 			timer(l, false);
+			set(noUser,false);
 			switch (command) {
 			case noCyb:
 				if (get(l))
@@ -633,29 +588,28 @@ public class CybService extends Service {
 			case noNet:
 			case start:
 				if ((get(l)) && (command != reLogin)) {
-					if (command == noNet) {
+					if (command == noNet){
 						// inform that logged in but still no net
 					}
 				} else {
-					Const reason = Methods.attemptLogin(getApplicationContext());
-					if (reason == loggedIn) {
+					Const result = Methods.attemptLogin(getApplicationContext());
+					if (result == loggedIn) {
+						set(maxLogin,false);
 						set(l, true);
 						timer(l, true);
 						dispatch(top, netRecheck);
 					} else {
 						set(l, false);
-						switch (reason) {
+						switch (result) {
 						case maxLogin:
+							set(maxLogin,true);
 							timer(lF, true);
 							break;
+						case noUser:
+							set(noUser,true);
 						case wrongIdPwd:
 							dispatch(top, wrongIdPwd);
 							break;
-						case noUser:
-							//TODO notify no user clicking on notification will start login activity with button of listactivty
-							//timer();
-							// todo stop timer and receivers until user id
-							// received
 						}
 					}
 				}

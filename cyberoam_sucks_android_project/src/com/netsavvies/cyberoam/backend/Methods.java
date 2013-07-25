@@ -1,5 +1,8 @@
 package com.netsavvies.cyberoam.backend;
 
+import static com.netsavvies.cyberoam.backend.Vars.*;
+import static com.netsavvies.cyberoam.backend.Const.*;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -36,9 +39,57 @@ import android.util.Log;
 import android.widget.Toast;
 
 class Methods {
-    private static ArrayList<UserDetails>data;
-	
-	
+	private static ArrayList<UserDetails> data;
+	private static int position;
+
+	static void execute(Const key, boolean bool, Context ctx) {
+		Log.wtf("Execute", key.name() + " " + bool);
+		switch (key) {
+		case wifi:
+			turnWifi(ctx, bool);
+		}
+	}
+
+	static void set(Const key, Boolean bool) {
+		Log.wtf("set", key.name() + " " + bool);
+		bool_hs.put(key, bool);
+		// updateGuiStatus();
+	}
+
+	public static boolean get(Const key) {
+		if (getNoLog(key)) {
+			Log.wtf("get", key.name() + " true");
+			return true;
+		} else {
+			Log.wtf("get", key.name() + " false");
+			return false;
+		}
+	}
+
+	public static boolean getNoLog(Const key) {
+		if (bool_hs.containsKey(key)) {
+			return bool_hs.get(key);
+		} else {
+			bool_hs.put(key, false);
+			return false;
+		}
+
+	}
+
+	public static char getTF(Const key) {
+		if (getNoLog(key))
+			return 'T';
+		else
+			return 'F';
+	}
+
+	public static char gettf(Const key) {
+		if (getNoLog(key))
+			return 't';
+		else
+			return 'f';
+	}
+
 	static boolean isCyberoamAvailbale(Context context) {
 		if (!isWifiConnected(context))
 			return false;
@@ -67,15 +118,14 @@ class Methods {
 		NetworkInfo mWifi = connManager
 				.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
 
-		Log.wtf("isWifiConnected",mWifi.isConnected()+"");
-		
+		Log.wtf("isWifiConnected", mWifi.isConnected() + "");
+
 		return mWifi.isConnected();
 	}
 
 	static int isConnectionAlive(Context context) {
 		if (!isWifiConnected(context))
 			return 0;
-		
 
 		String message = "";
 		HttpClient httpclient = new DefaultHttpClient();
@@ -100,23 +150,22 @@ class Methods {
 				}
 
 			}
-		} catch (ClientProtocolException e) { 
+		} catch (ClientProtocolException e) {
 			e.printStackTrace();
-		} catch (IOException e) { 
+		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			
+
 			e.printStackTrace();
 		} catch (SAXException e) {
-			
+
 			e.printStackTrace();
 
 		}
 
 		if (message.equals("Playpower Labs"))
 			return 1;
-		else
-		{
+		else {
 			HttpURLConnection urlc;
 
 			try {
@@ -139,21 +188,24 @@ class Methods {
 
 	static boolean isStrengthEnough(Context context) {
 		// TODO Auto-generated method stub
-		if(!isWifiConnected(context))
+		if (!isWifiConnected(context))
 			return false;
-		
-		WifiManager mywifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-		int level = calculateSignalLevel((mywifiManager.getConnectionInfo().getRssi()));
-		Log.wtf("WifiStrength",level+"");
-	    if(level >= Vars.thresholdStrength)
-	    	return true;
-	    else
-	    	return false;
-	
+
+		WifiManager mywifiManager = (WifiManager) context
+				.getSystemService(Context.WIFI_SERVICE);
+		int level = calculateSignalLevel((mywifiManager.getConnectionInfo()
+				.getRssi()));
+		Log.wtf("WifiStrength", level + "");
+		if (level >= Vars.thresholdStrength)
+			return true;
+		else
+			return false;
+
 	}
-	
-	static void turnWifi(Context context,boolean bool){
-		((WifiManager) context.getSystemService(Context.WIFI_SERVICE)).setWifiEnabled(bool); 
+
+	static void turnWifi(Context context, boolean bool) {
+		((WifiManager) context.getSystemService(Context.WIFI_SERVICE))
+				.setWifiEnabled(bool);
 	}
 
 	static int calculateSignalLevel(int rssi) {
@@ -164,67 +216,94 @@ class Methods {
 		if (rssi <= MIN_RSSI) {
 			return 0;
 		} else if (rssi >= MAX_RSSI) {
-			return numLevels-1;
+			return numLevels - 1;
 		} else {
 			float inputRange = (MAX_RSSI - MIN_RSSI);
-			float outputRange = (numLevels-1);
+			float outputRange = (numLevels - 1);
 			return (int) ((float) (rssi - MIN_RSSI) * outputRange / inputRange);
 		}
 	}
-	
-	public static void attemptLogout(Context context, String loginid,	String loginpassword) {
-		Log.wtf("logoutMsg", contactServer("193", loginid, loginpassword, context));
-		Vars.isloggedIn=false;
+
+	public static void attemptLogout(Context context, String loginid,
+			String loginpassword) {
+		
+		while(contactServer("193", loginid, loginpassword, context).equals(logoutMessage))
+		{
+			Log.wtf("logoutMsg","Not logged out");
+		}
+		  Log.wtf("logourMsg","logged out");
+		Vars.isloggedIn = false;
 
 	}
+
 	private static String getloginId(int i) {
-		if(i>data.size()-1)
+		if (i > data.size() - 1)
 			return null;
 		else
 			return data.get(i).getId();
 	}
+
+	private static void setStatus(int i, Const status) {
+		if (!(i > data.size() - 1))
+			data.get(i).setStatus(status);
+	}
+
 	private static String getloginPassword(int i) {
 		return data.get(i).getPassword();
 	}
+
 	public static Const attemptLogin(Context context) {
 		int i = 0;
+		int r = 0;
+		position = 0;
 		String message;
-		//get all the users in one go and store them.
+		// get all the users in one go and store them.
 		DatabaseHandler db = new DatabaseHandler(context);
-		data=db.getAllUsers();
+		data = db.getAllUsers();
 		db.close();
-		if(data.size()==0)
-			return Const.noUser;
-		
+		if (data.size() == 0)
+			return noUser;
+
 		while (getloginId(i) != null) {
-			if(getChecked(i))
-			{
-		message = contactServer("191", getloginId(i), getloginPassword(i),
-				context);
-		Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
-		Log.wtf("loginMsg", message);
-		if (message.equals("You have successfully logged in")) {
-			Vars.isloggedIn = true;
-			Vars.loginId = getloginId(i);
-			Vars.password = getloginPassword(i);
-			return Const.loggedIn;
-			
+			position++;
+			if (getChecked(i)) {
+
+				message = contactServer("191", getloginId(i),
+						getloginPassword(i), context);
+				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+				Log.wtf("loginMsg", message);
+				if (message.equals(loginMessage)) {
+					Vars.isloggedIn = true;
+					Vars.loginId = getloginId(i);
+					Vars.password = getloginPassword(i);
+					setStatus(i, loggedIn);
+
+					return loggedIn;
+
+				} else if (message.equals(cyberlessMessage))
+					return cyberLess;
+				else if (message.equals(wrongIdpwdmessage))
+					setStatus(i, wrongIdPwd);
+				else if (message.equals(maxloginMessage)) {
+					setStatus(i, maxLogin);
+					r++;
+				}
+			} else
+				setStatus(i, notChecked);
+			i++;
 		}
-		else if(message.equals("You are already logged in as a clientless user"))
-			return Const.cyberLess;
-			}
-		i++;
-		 } 
-		return Const.maxLogin;
+		if (r != 0)
+			return maxLogin;
+		else
+			return wrongIdPwd;
 
 	}
-	
-	
+
 	private static boolean getChecked(int i) {
-		if(data.get(i).getChecked()==1)
-		return  true;
+		if (data.get(i).getChecked() == 1)
+			return true;
 		else
-		return false;
+			return false;
 	}
 
 	public static String contactServer(String loginmode, String loginid,
@@ -239,7 +318,7 @@ class Methods {
 		nvps.add(new BasicNameValuePair("password", loginpassword));
 		try {
 			client.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-		} catch (UnsupportedEncodingException e) { 
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		try {
@@ -261,18 +340,18 @@ class Methods {
 				}
 
 			}
-		} catch (ClientProtocolException e) { 
+		} catch (ClientProtocolException e) {
 			e.printStackTrace();
-		} catch (IOException e) { 
+		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ParserConfigurationException e) {
-			
+
 			e.printStackTrace();
 		} catch (SAXException e) {
-			
+
 			e.printStackTrace();
 		}
 		return message;
 	}
-	
+
 }
