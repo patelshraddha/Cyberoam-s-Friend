@@ -64,9 +64,9 @@ public enum Const {
 	
 	
 	//messages
-	
-	
-	
+	otherWifi,
+	loginFailed,
+	current;
 	
 	
 }

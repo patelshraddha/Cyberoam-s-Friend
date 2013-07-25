@@ -3,6 +3,7 @@ package com.netsavvies.cyberoam.backend;
 import static com.netsavvies.cyberoam.backend.Vars.*;
 import static com.netsavvies.cyberoam.backend.Const.*;
 
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -31,6 +32,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.netsavvies.cyberoam.R;
+import com.netsavvies.cyberoam.gui.InformGui;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -38,7 +42,7 @@ import android.net.wifi.WifiManager;
 import android.util.Log;
 import android.widget.Toast;
 
-class Methods {
+public class Methods {
 	private static ArrayList<UserDetails> data;
 	private static int position;
 
@@ -53,7 +57,7 @@ class Methods {
 	static void set(Const key, Boolean bool) {
 		Log.wtf("set", key.name() + " " + bool);
 		bool_hs.put(key, bool);
-		// updateGuiStatus();
+	    InformGui.updateGuiStatus(key,bool);
 	}
 
 	public static boolean get(Const key) {
@@ -64,6 +68,31 @@ class Methods {
 			Log.wtf("get", key.name() + " false");
 			return false;
 		}
+	}
+	
+	public static String getMessage(Const key)
+	{
+		if(strings.containsKey(key))
+			return strings.get(key);
+		else
+			return null;
+	}
+	
+	public static int getIcon(Const key)
+	{
+		if(icons.containsKey(key))
+			return icons.get(key);
+		else
+			return R.drawable.ic_launcher;
+	}
+	
+	public static String getButton(Const key)
+	{
+		if(buttons.containsKey(key))
+		    return buttons.get(key);
+		else
+			return "NA";
+		
 	}
 
 	public static boolean getNoLog(Const key) {

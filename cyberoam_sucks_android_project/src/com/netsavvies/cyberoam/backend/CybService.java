@@ -39,10 +39,12 @@ public class CybService extends Service {
 	private Hashtable<Const, BroadcastReceiver> bcr_hs;
 	private Hashtable<Const, Boolean> bcrExist_hs;
 
+	private static Context context;
+
 	// all commands
 
 	private void init() {
-
+        context =getApplicationContext();
 		run_hs = new Hashtable<Const, Runnable>();
 		runExist_hs = new Hashtable<Const, Boolean>();
 		bcr_hs = new Hashtable<Const, BroadcastReceiver>();
@@ -58,6 +60,16 @@ public class CybService extends Service {
 		set(isStopped, false);
 		set(cyberLess, false);
 		*/
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		
 		// set handler and tasks
@@ -176,16 +188,9 @@ public class CybService extends Service {
 		bcrExist_hs.put(wifi, false);
 		bcrExist_hs.put(wifiLocha, false);
 		bcrExist_hs.put(str, false);
-		
-		
-		//noti 
-		updateGuiStatus();
 	}
 	
-	private void updateGuiStatus(){
-		String txt= "W:"+gettf(wifi)+" N:"+gettf(net)+" S:"+gettf(str)+" C:"+gettf(c)+" L:"+gettf(l);
-		InformGui.Notify(txt, this);
-	}
+	
 	
 	
 
@@ -716,7 +721,7 @@ public class CybService extends Service {
 		 * InformGui.Notify("Supreme can't be reached",
 		 * getApplicationContext()); } }
 		 */
-		// Static.receiverContext=getApplicationContext();
+		//getApplicationContext();
 		return super.onStartCommand(intent, flags, startId);
 
 	}
@@ -724,7 +729,10 @@ public class CybService extends Service {
 	
 
 	
-
+         public static Context getContext()
+         {
+        	 return context;
+         }
 	
 
 	

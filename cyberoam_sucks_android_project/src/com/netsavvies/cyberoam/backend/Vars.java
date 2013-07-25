@@ -2,6 +2,10 @@ package com.netsavvies.cyberoam.backend;
 
 import java.util.Hashtable;
 
+import com.netsavvies.cyberoam.R;
+
+import static com.netsavvies.cyberoam.backend.Const.*;
+
 //TODO remove comment
 
 /*
@@ -53,5 +57,43 @@ public class Vars {
 		strings = new Hashtable<Const, String>();
 		icons=new Hashtable<Const,Integer>();
 		buttons=new Hashtable<Const,String>();
+		
+		//putting messages
+		strings.put(wifiDisconnected,"Wifi disconnected");
+		icons.put(wifiDisconnected,R.drawable.ic_launcher);
+		buttons.put(wifiDisconnected,"Turn on wifi");
+		
+		strings.put(cyberLess,"You are already logged in a cyberless client.");
+		icons.put(cyberLess,R.drawable.ic_launcher);
+		buttons.put(cyberLess,"NA");
+		
+		strings.put(otherWifi,"Connected via another wifi");
+		icons.put(otherWifi,R.drawable.ic_launcher);
+		buttons.put(otherWifi,"NA");
+		
+		strings.put(noNet,"Logged in but no net");
+		icons.put(noNet,R.drawable.ic_launcher);
+		buttons.put(noNet,"NA");
+		
+		strings.put(lowSTR,"Not able to login due to less strength");
+		icons.put(lowSTR,R.drawable.ic_launcher);
+		buttons.put(lowSTR,"NA");
+		
+		strings.put(noCyb,"Not able to login because cyberoam not available");
+		icons.put(noCyb,R.drawable.ic_launcher);
+		buttons.put(noCyb,"NA");
+		
+		strings.put(loggedIn,"Logged in by id "+Vars.loginId);
+		icons.put(loggedIn,R.drawable.ic_launcher);
+		buttons.put(loggedIn,"Logout");
+		
+		strings.put(noUser,"No user added.");
+		icons.put(noUser,R.drawable.ic_launcher);
+		buttons.put(noUser,"Add users");
+		
+		strings.put(loginFailed,"Login failed.");
+		icons.put(loginFailed,R.drawable.ic_launcher);
+		buttons.put(loginFailed,"NA");
+				
 	}
 }
