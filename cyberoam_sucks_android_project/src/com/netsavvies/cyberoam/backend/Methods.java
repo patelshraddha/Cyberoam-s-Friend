@@ -3,7 +3,6 @@ package com.netsavvies.cyberoam.backend;
 import static com.netsavvies.cyberoam.backend.Vars.*;
 import static com.netsavvies.cyberoam.backend.Const.*;
 
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -39,6 +38,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -57,7 +58,7 @@ public class Methods {
 	static void set(Const key, Boolean bool) {
 		Log.wtf("set", key.name() + " " + bool);
 		bool_hs.put(key, bool);
-	    InformGui.updateGuiStatus(key,bool);
+		// InformGui.updateGuiStatus(key,bool);
 	}
 
 	public static boolean get(Const key) {
@@ -69,30 +70,27 @@ public class Methods {
 			return false;
 		}
 	}
-	
-	public static String getMessage(Const key)
-	{
-		if(strings.containsKey(key))
+
+	public static String getMessage(Const key) {
+		if (strings.containsKey(key))
 			return strings.get(key);
 		else
 			return null;
 	}
-	
-	public static int getIcon(Const key)
-	{
-		if(icons.containsKey(key))
+
+	public static int getIcon(Const key) {
+		if (icons.containsKey(key))
 			return icons.get(key);
 		else
 			return R.drawable.ic_launcher;
 	}
-	
-	public static String getButton(Const key)
-	{
-		if(buttons.containsKey(key))
-		    return buttons.get(key);
+
+	public static String getButton(Const key) {
+		if (buttons.containsKey(key))
+			return buttons.get(key);
 		else
 			return "NA";
-		
+
 	}
 
 	public static boolean getNoLog(Const key) {
@@ -255,14 +253,14 @@ public class Methods {
 
 	public static void attemptLogout(Context context, String loginid,
 			String loginpassword) {
-		
-		while(contactServer("193", loginid, loginpassword, context).equals(logoutMessage))
-		{
-			Log.wtf("logoutMsg","Not logged out");
-		}
-		  Log.wtf("logourMsg","logged out");
-		Vars.isloggedIn = false;
 
+		while (contactServer("193", loginid, loginpassword, context).equals(
+				logoutMessage)) {
+			Log.wtf("logoutMsg", "Not logged out");
+		}
+		Log.wtf("logourMsg", "logged out");
+		Vars.isloggedIn = false;
+		Vars.loginId = null;
 	}
 
 	private static String getloginId(int i) {
@@ -383,4 +381,13 @@ public class Methods {
 		return message;
 	}
 
+	public static Message constructHandlerMessage(Const cnt) {
+		Bundle bundle = new Bundle();
+		bundle.putString("Const", cnt.name());
+
+		Message msg = new Message();
+		msg.setData(bundle);
+		return msg;
+
+	}
 }

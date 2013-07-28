@@ -15,8 +15,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.os.StrictMode;
 import android.os.SystemClock;
 import android.util.Log;
@@ -28,6 +30,24 @@ import static com.netsavvies.cyberoam.backend.Methods.*;
 public class CybService extends Service {
 
 	int connection;
+
+	private Handler theHandler = new Handler() {
+
+		protected void finalize() {
+			dispatch(top, stop);
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			Const constMsg = Const.valueOf(msg.getData().getString(("Const")));
+			if (constMsg == init) {
+				init();
+			} else {
+				dispatch(top, constMsg);
+			}
+			super.handleMessage(msg);
+		}
+	}; // the thread handling all the actual operations
 
 	private BroadcastReceiver receiversForCybService;
 	// all events
@@ -44,34 +64,23 @@ public class CybService extends Service {
 	// all commands
 
 	private void init() {
-        context =getApplicationContext();
+		context =this;
 		run_hs = new Hashtable<Const, Runnable>();
 		runExist_hs = new Hashtable<Const, Boolean>();
 		bcr_hs = new Hashtable<Const, BroadcastReceiver>();
 		bcrExist_hs = new Hashtable<Const, Boolean>();
 
 		// set boolean & noti
-		
+
 		/* not needed
 		set(c, false);
 		set(l, false);
 		set(str, false);
 		set(wifi, false);
-		set(isStopped, false);
+		set(isHalted, false);
 		set(cyberLess, false);
 		*/
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
 		// set handler and tasks
 		run_hs.put(c, new Runnable() {
 
@@ -126,40 +135,42 @@ public class CybService extends Service {
 
 			@Override
 			public void onReceive(Context context, Intent intent) {
-					/*if (intent.getBooleanExtra(
-							WifiManager.EXTRA_SUPPLICANT_CONNECTED, false)) {
-						dispatch(top, wifiConnected);
-					} else {
-						dispatch(top, wifiDisconnected);
-					}*/
-				
-				if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+				/*if (intent.getBooleanExtra(
+						WifiManager.EXTRA_SUPPLICANT_CONNECTED, false)) {
+					dispatch(top, wifiConnected);
+				} else {
+					dispatch(top, wifiDisconnected);
+				}*/
+
+				if (intent.getAction().equals(
+						ConnectivityManager.CONNECTIVITY_ACTION)) {
 					if (Methods.isWifiConnected(context)) {
-					
-						if(!get(wifi)){
-							set(wifi,true);
+
+						if (!get(wifi)) {
+							set(wifi, true);
 							dispatch(top, wifiConnected);
 						}
-					
-					} else if (get(wifi)){
-						set(wifi,false);
+
+					} else if (get(wifi)) {
+						set(wifi, false);
 						dispatch(top, wifiDisconnected);
 					}
 				}
 			}
 		});
-		
+
 		bcr_hs.put(wifiLocha, new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				// TODO Auto-generated method stub
-				if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
-					if (Methods.isWifiConnected(context)   ){
-						if(!get(wifiForLocha)){
-							set(wifiForLocha,true);
+				if (intent.getAction().equals(
+						ConnectivityManager.CONNECTIVITY_ACTION)) {
+					if (Methods.isWifiConnected(context)) {
+						if (!get(wifiForLocha)) {
+							set(wifiForLocha, true);
 							dispatch(top, wifiKaLochaTheekKaro);
 						}
-						
+
 					}
 				}
 			}
@@ -188,29 +199,26 @@ public class CybService extends Service {
 		bcrExist_hs.put(wifi, false);
 		bcrExist_hs.put(wifiLocha, false);
 		bcrExist_hs.put(str, false);
+
 	}
-	
-	
-	
-	
 
 	private boolean check(Const key) {
 		boolean result = false;
 		switch (key) {
 		case wifi:
-			result =  Methods.isWifiConnected(getApplicationContext());
+			result = Methods.isWifiConnected(getApplicationContext());
 			break;
 		case c:
 			result = Methods.isCyberoamAvailbale(getApplicationContext());
 			break;
 		case l:
-			result= get(key);
+			result = get(key);
 		case str:
-			result= Methods.isStrengthEnough(getApplicationContext());
-         }
+			result = Methods.isStrengthEnough(getApplicationContext());
+		}
 		Log.wtf("check", key.name() + " " + result);
 		return result;
-		
+
 	}
 
 	private void timer(Const key, boolean bool) {
@@ -241,7 +249,7 @@ public class CybService extends Service {
 					timer(l, false);
 
 				} else if (!runExist_hs.get(lF)) {
-					handler.postDelayed(run_hs.get(l),Vars.loginTrialInterval);
+					handler.postDelayed(run_hs.get(l), Vars.loginTrialInterval);
 					runExist_hs.put(lF, true);
 				}
 
@@ -255,8 +263,7 @@ public class CybService extends Service {
 		case c:
 			if (bool) {
 				if (!(runExist_hs.get(c))) {
-					handler.postDelayed(run_hs.get(c),
-							Vars.cybCheckInterval);
+					handler.postDelayed(run_hs.get(c), Vars.cybCheckInterval);
 					runExist_hs.put(c, true);
 				}
 
@@ -268,8 +275,7 @@ public class CybService extends Service {
 		case net:
 			if (bool) {
 				if (!(runExist_hs.get(net))) {
-					handler.postDelayed(run_hs.get(net),
-							Vars.netCheckInterval);
+					handler.postDelayed(run_hs.get(net), Vars.netCheckInterval);
 					runExist_hs.put(net, true);
 				}
 
@@ -288,7 +294,8 @@ public class CybService extends Service {
 		switch (key) {
 		case wifi:
 			if (bool && !bcrExist_hs.get(wifi)) {
-				registerReceiver(bcr_hs.get(wifi), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+				registerReceiver(bcr_hs.get(wifi), new IntentFilter(
+						ConnectivityManager.CONNECTIVITY_ACTION));
 				bcrExist_hs.put(wifi, true);
 			} else if (bcrExist_hs.get(wifi)) {
 				unregisterReceiver(bcr_hs.get(wifi));
@@ -298,7 +305,8 @@ public class CybService extends Service {
 
 		case wifiLocha:
 			if (bool && !bcrExist_hs.get(wifiLocha)) {
-				registerReceiver(bcr_hs.get(wifiLocha), new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+				registerReceiver(bcr_hs.get(wifiLocha), new IntentFilter(
+						ConnectivityManager.CONNECTIVITY_ACTION));
 				bcrExist_hs.put(wifiLocha, true);
 			} else if (bcrExist_hs.get(wifiLocha)) {
 				unregisterReceiver(bcr_hs.get(wifiLocha));
@@ -319,28 +327,38 @@ public class CybService extends Service {
 
 		default:
 			// locho
+			break;
 
 		}
 	}
 
 	private void dispatch(Const level, Const command) {
 		Log.wtf("dispatch", level.name() + " " + command.name());
-		Toast.makeText(getApplicationContext(),level+"   "+command,Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplicationContext(), level + "   " + command,
+				Toast.LENGTH_SHORT).show();
 		switch (level) {
 		case top:
 			switch (command) {
-			
+
+			case disable:
+				set(isDisabled, true);
+				command = stop;
 			case wrongIdPwd:
 			case stop:
-				if (!get(Const.isStopped)) {
-					set(Const.isStopped, true);
-					dispatch(Const.wifi, command);
+				if (get(isRunning)) {
+					set(isRunning, false);
+					dispatch(wifi, command);
 				}
 				break;
+			case enable:
+				set(isDisabled, false);
+				command = start;
 			case start:
-				Log.wtf("blah", "b");
-				if (!get(isStopped)) {
+				if (!get(isRunning) && !get(isDisabled)) {
+					set(isRunning, true);
 					dispatch(wifi, command);
+				} else {
+					Log.wtf("service", "halted or running service can't start");
 				}
 
 				break;
@@ -350,42 +368,48 @@ public class CybService extends Service {
 
 				break;
 			default:
-				if (!get(isStopped)) {
+				if (get(isRunning)) {
 					dispatch(wifi, command);
 				}
 				break;
 			}
 
 			break; // Top Over
-			
+
 		case wifi: {
 			// after getting ip address
-			switch (command){
+			switch (command) {
 			case stop:
 				receiver(wifi, false);
-			case wifiConnected:
+				InformGui.updateGuiStatus(this,stop);
 			case wifiDisconnected:
+				// InformGui.updateGuiStatus(wifiDisconnected, true);
+			case wifiConnected:
 				dispatch(net, command);
 				break;
 			case start:
 				if (check(wifi)) {
-					set(wifi,true);
+					set(wifi, true);
 					receiver(wifi, true);
 					dispatch(net, command);
-				} else
+				} else {
+					Toast.makeText(this,"wifidisconnected",Toast.LENGTH_SHORT).show();
+					InformGui.updateGuiStatus(this,wifiDisconnected);
 					receiver(wifi, true);
+				}
 				break;
 			case wifiKaLochaAaya:
 				receiver(wifi, false);
 				receiver(wifiLocha, true);
-				execute(wifi, true,this);
+				execute(wifi, true, this);
+				InformGui.updateGuiStatus(this,wifiKaLochaAaya);
 				break;
 			case wifiKaLochaTheekKaro:
-				//SystemClock.sleep(1000);
 				dispatch(net, wifiKaLochaTheekKaro);
+				InformGui.updateGuiStatus(this,wifiDisconnected);
 				receiver(wifiLocha, false);
-				execute(wifi,false,this);
-				set(wifiForLocha,false);
+				execute(wifi, false, this);
+				set(wifiForLocha, false);
 				receiver(wifi, true);
 				break;
 			case wifiKaBahotBadaLocha:
@@ -417,8 +441,9 @@ public class CybService extends Service {
 			case start:
 				timer(net, true);
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
-					set(cyberLess, true);
+					// set(cyberLess, true);
 					set(net, true);
+					InformGui.updateGuiStatus(this,otherWifi);
 					// inform that cyberless login or another wifi
 				} else {
 					dispatch(str, command);
@@ -442,11 +467,12 @@ public class CybService extends Service {
 				}
 				break;
 			case netRecheck:
-				if (Methods.isConnectionAlive(getApplicationContext()) == 1)
+				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
 					set(net, true);
-				else {
+					InformGui.updateGuiStatus(this,loggedIn);
+				} else {
 					set(net, false);
-					// notify logged in but no net
+					InformGui.updateGuiStatus(this,noNet);
 				}
 				break;
 
@@ -471,17 +497,18 @@ public class CybService extends Service {
 					set(str, true);
 					receiver(str, true);
 					dispatch(c, command);
+
 				} else {
-					
+					InformGui.updateGuiStatus(this,lowSTR);
 					receiver(str, true);
 				}
 				return;
-			
+
 			case stop:
 			case wifiDisconnected:
-				set(str,false);
+				set(str, false);
 			case wrongIdPwd:
-			    receiver(str, false);
+				receiver(str, false);
 				dispatch(c, command);
 				return;
 			case strChange:
@@ -545,10 +572,12 @@ public class CybService extends Service {
 				case highSTR:
 				case reLogin:
 					timer(c, true);
+					InformGui.updateGuiStatus(this,noCyb);
 					break;
 
 				case lowSTR:
 				case wifiKaLochaTheekKaro:
+					InformGui.updateGuiStatus(this,wifiKaBahotBadaLocha);
 					dispatch(top, wifiKaBahotBadaLocha);
 					timer(c, false);
 					break;
@@ -560,7 +589,7 @@ public class CybService extends Service {
 
 				if (get(c)) {
 					dispatch(l, noCyb);
-					
+
 				}
 
 			}
@@ -569,7 +598,7 @@ public class CybService extends Service {
 
 		case l: {
 			timer(l, false);
-			set(noUser,false);
+			set(noUser, false);
 			switch (command) {
 			case noCyb:
 				if (get(l))
@@ -578,8 +607,9 @@ public class CybService extends Service {
 				break;
 			case lowSTR:
 				if (get(l)) {
-					Methods.attemptLogout(getApplicationContext(), Vars.loginId,
-							Vars.password);
+					Methods.attemptLogout(getApplicationContext(),
+							Vars.loginId, Vars.password);
+					InformGui.updateGuiStatus(this,loggedOutLessStrength);
 					set(l, false);
 				}
 				break;
@@ -593,26 +623,32 @@ public class CybService extends Service {
 			case noNet:
 			case start:
 				if ((get(l)) && (command != reLogin)) {
-					if (command == noNet){
+					if (command == noNet) {
 						// inform that logged in but still no net
 					}
 				} else {
-					Const result = Methods.attemptLogin(getApplicationContext());
+					Const result = Methods
+							.attemptLogin(getApplicationContext());
 					if (result == loggedIn) {
-						set(maxLogin,false);
+						set(maxLogin, false);
 						set(l, true);
 						timer(l, true);
+						InformGui.updateGuiStatus(this,loggedIn);
 						dispatch(top, netRecheck);
 					} else {
 						set(l, false);
 						switch (result) {
 						case maxLogin:
-							set(maxLogin,true);
+							set(maxLogin, true);
+							InformGui.updateGuiStatus(this,loginFailed);
 							timer(lF, true);
 							break;
 						case noUser:
-							set(noUser,true);
+							InformGui.updateGuiStatus(this,noUser);
+							set(noUser, true);
+							break;
 						case wrongIdPwd:
+							InformGui.updateGuiStatus(this,loginFailed);
 							dispatch(top, wrongIdPwd);
 							break;
 						}
@@ -624,14 +660,16 @@ public class CybService extends Service {
 			case wifiKaLochaTheekKaro:
 			case stop:
 				if (get(l))
-					Methods.attemptLogout(getApplicationContext(), Vars.loginId,
-							Vars.password);
+					Methods.attemptLogout(getApplicationContext(),
+							Vars.loginId, Vars.password);
 				set(l, false);
 				break;
 
 			case wifiDisconnected:
 				if (get(l))
 					dispatch(top, wifiKaLochaAaya);
+				else
+					InformGui.updateGuiStatus(this,wifiDisconnected);
 				break;
 			default:
 				break;
@@ -643,25 +681,24 @@ public class CybService extends Service {
 	}
 
 	@Override
-	public void onCreate() {
+	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void onCreate() {
+		theHandler.handleMessage(constructHandlerMessage(init));
+
 		super.onCreate();
-
-		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
-				.permitAll().build();
-
-		StrictMode.setThreadPolicy(policy);
-		init();
-		dispatch(top, start);
-
 	}
 
 	@Override
 	public void onLowMemory() {
 		// TODO Auto-generated method stub
 		super.onLowMemory();
-		Log.wtf("WTF","lowMemory");
-		dispatch(top, stop);
+		Log.wtf("WTF", "lowMemory");
+		theHandler.handleMessage(constructHandlerMessage(stop));
 	}
 
 	/*
@@ -673,33 +710,22 @@ public class CybService extends Service {
 		dispatch(top, stop);
 	}
 	*/
-	
+
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
-		Log.wtf("WTF","destroy");
-		dispatch(top, stop);
-	}
-
-	@Override
-	public IBinder onBind(Intent arg0) {
-		// TODO Auto-generated method stub
-		return null;
+		Log.wtf("WTF", "destroy");
+		theHandler.handleMessage(constructHandlerMessage(stop));
 	}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		// TODO Auto-generated method stub
-		// String action = intent.getStringExtra("action");
 		Vars.isloggedIn = false;
 		Vars.loginId = null;
-		
-		// Build notification
-		// Actions are just fake
 
-		// Stop the activity if rebooted.
 		/*
+		<<<<<<< HEAD
 		 * if (action == "android.intent.action.BOOT_COMPLETED")
 		 * InformGui.Notify("Boot completed", getApplicationContext());
 		 */
@@ -721,22 +747,20 @@ public class CybService extends Service {
 		 * InformGui.Notify("Supreme can't be reached",
 		 * getApplicationContext()); } }
 		 */
-		//getApplicationContext();
+		// getApplicationContext();
+
+		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
+				.permitAll().build();
+
+		StrictMode.setThreadPolicy(policy);
+
+		theHandler.handleMessage(constructHandlerMessage(start));
+
 		return super.onStartCommand(intent, flags, startId);
 
 	}
 
-	
-
-	
-         public static Context getContext()
-         {
-        	 return context;
-         }
-	
-
-	
-
-	
-
+	public static Context getContext() {
+		return context;
+	}
 }

@@ -11,7 +11,8 @@ public enum Const {
 	l,
 	lF,
 	
-	isStopped,
+	isRunning,
+	isDisabled,
 	cyberLess,
 	
 	
@@ -21,6 +22,9 @@ public enum Const {
 	start,
 	restart,
 	stop,
+	disable,
+	enable,
+	init,
 	
 	//wifi
 	wifiConnected,
@@ -66,6 +70,7 @@ public enum Const {
 	//messages
 	otherWifi,
 	loginFailed,
+	loggedOutLessStrength,
 	current;
 	
 	

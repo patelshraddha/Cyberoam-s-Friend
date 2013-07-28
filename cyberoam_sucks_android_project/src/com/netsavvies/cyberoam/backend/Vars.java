@@ -46,8 +46,8 @@ public class Vars {
 	static final public Hashtable<Const,Integer> icons;
 	static final public Hashtable<Const,String> buttons;
 	// user data
-	static String loginId;
-	static boolean isloggedIn;
+	public static String loginId;
+	public static boolean isloggedIn;
 	static String password;
 
 	public static int imageid;
@@ -79,11 +79,21 @@ public class Vars {
 		icons.put(lowSTR,R.drawable.ic_launcher);
 		buttons.put(lowSTR,"NA");
 		
+		strings.put(loggedOutLessStrength,"Logged out due to less strength.");
+		icons.put(loggedOutLessStrength,R.drawable.ic_launcher);
+		buttons.put(loggedOutLessStrength,"NA");
+		
+		
+		strings.put(wifiKaBahotBadaLocha,"Unable to log out since cyberoam not available.");
+		icons.put(wifiKaBahotBadaLocha,R.drawable.ic_launcher);
+		buttons.put(wifiKaBahotBadaLocha,"NA");
+		
+		
 		strings.put(noCyb,"Not able to login because cyberoam not available");
 		icons.put(noCyb,R.drawable.ic_launcher);
 		buttons.put(noCyb,"NA");
 		
-		strings.put(loggedIn,"Logged in by id "+Vars.loginId);
+		strings.put(loggedIn,"Logged in by id ");
 		icons.put(loggedIn,R.drawable.ic_launcher);
 		buttons.put(loggedIn,"Logout");
 		
@@ -94,6 +104,14 @@ public class Vars {
 		strings.put(loginFailed,"Login failed.");
 		icons.put(loginFailed,R.drawable.ic_launcher);
 		buttons.put(loginFailed,"NA");
+		
+		strings.put(stop,"Service stopped.");
+		icons.put(stop,R.drawable.ic_launcher);
+		buttons.put(stop,"Start Again.");
+		
+		strings.put(wifiKaLochaAaya,"Wifi turned off without logging out.");
+		icons.put(wifiKaLochaAaya,R.drawable.ic_launcher);
+		buttons.put(wifiKaLochaAaya,"NA");
 				
 	}
 }
