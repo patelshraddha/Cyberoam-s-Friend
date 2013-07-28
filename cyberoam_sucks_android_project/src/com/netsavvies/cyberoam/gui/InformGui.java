@@ -32,17 +32,19 @@ public class InformGui {
 	public static void Notify(String subject, Context context,int icon) {
 
 		Intent intent = new Intent(context, StatusActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		PendingIntent pIntent = PendingIntent
 				.getActivity(context, 0, intent, 0);
 
+		
 		// Bitmap largeIcon =
 		// BitmapFactory.decodeResource(context.getResources(),R.drawable.large);
-
+		Toast.makeText(context,"Notify"+getMessage(current),Toast.LENGTH_SHORT).show();
 		Notification noti = new NotificationCompat.Builder(context)
 				.setContentTitle("Internet Connection Status")
-				.setContentText(subject).setSmallIcon(R.drawable.ic_launcher)
+				.setContentText(subject).setSmallIcon(icon)
 				.setContentIntent(pIntent).build();
-
+    
 		NotificationManager notificationManager = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -52,7 +54,8 @@ public class InformGui {
 		noti.flags |= Notification.FLAG_ONGOING_EVENT;
 		// Let the notification be ongoing
 		noti.flags |= Notification.FLAG_FOREGROUND_SERVICE;
-		notificationManager.notify(231, noti);
+		notificationManager.notify(0, noti);
+		Toast.makeText(context,"Notified"+getMessage(current),Toast.LENGTH_SHORT).show();
 	}
 
 	public static void loggedIn(Context context, String id) {
@@ -160,13 +163,41 @@ public class InformGui {
 			strings.put(current,getMessage(key)+Vars.loginId);
 		else
 		strings.put(current, getMessage(key));
-		Toast.makeText(context,getMessage(current),Toast.LENGTH_SHORT).show();
+		Toast.makeText(context,getMessage(current)+R.drawable.ic_launcher,Toast.LENGTH_SHORT).show();
 		icons.put(current, getIcon(key));
 		buttons.put(current, getButton(key));
-		Notify(getMessage(current), CybService.getContext(),getIcon(current));
+		Notify(getMessage(current),context,getIcon(current));
 	}
 		
+	
+	
+	public static Notification getForeNoti(Context context)
+	{
+		Intent intent = new Intent(context, StatusActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		PendingIntent pIntent = PendingIntent
+				.getActivity(context, 0, intent, 0);
+
 		
+		// Bitmap largeIcon =
+		// BitmapFactory.decodeResource(context.getResources(),R.drawable.large);
+		Toast.makeText(context,"Notify"+getMessage(current),Toast.LENGTH_SHORT).show();
+		Notification noti = new NotificationCompat.Builder(context)
+				.setContentTitle("Internet Connection Status")
+				.setContentText("Starting service").setSmallIcon(R.drawable.ic_launcher)
+				.setContentIntent(pIntent).build();
+    
+		NotificationManager notificationManager = (NotificationManager) context
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+
+		// Do not Hide the notification after its selected
+		noti.flags |= Notification.FLAG_NO_CLEAR;
+		// Let the notification be ongoing
+		noti.flags |= Notification.FLAG_ONGOING_EVENT;
+		// Let the notification be ongoing
+		noti.flags |= Notification.FLAG_FOREGROUND_SERVICE;
+		return noti;
+	}
 		
 
 	

@@ -59,12 +59,10 @@ public class CybService extends Service {
 	private Hashtable<Const, BroadcastReceiver> bcr_hs;
 	private Hashtable<Const, Boolean> bcrExist_hs;
 
-	private static Context context;
-
 	// all commands
 
 	private void init() {
-		context =this;
+		startForeground(0,InformGui.getForeNoti(this));
 		run_hs = new Hashtable<Const, Runnable>();
 		runExist_hs = new Hashtable<Const, Boolean>();
 		bcr_hs = new Hashtable<Const, BroadcastReceiver>();
@@ -760,7 +758,5 @@ public class CybService extends Service {
 
 	}
 
-	public static Context getContext() {
-		return context;
-	}
+	
 }

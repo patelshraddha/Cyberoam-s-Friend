@@ -37,8 +37,7 @@ public class Vars {
 	static final String cyberlessMessage = "You are already logged in as a clientless user";
 	static final String maxloginMessage = "You have reached Maximum Login Limit.";
 	
-	static int icon;
-	static String message;
+	
 	
 	//strings/messages
 	
@@ -50,7 +49,7 @@ public class Vars {
 	public static boolean isloggedIn;
 	static String password;
 
-	public static int imageid;
+	//public static int imageid;
 
 	static {
 		bool_hs = new Hashtable<Const, Boolean>();
