@@ -63,8 +63,6 @@ public class CybService extends Service {
 
 	private void init() {
 		
-		
-		
 		run_hs = new Hashtable<Const, Runnable>();
 		runExist_hs = new Hashtable<Const, Boolean>();
 		bcr_hs = new Hashtable<Const, BroadcastReceiver>();
@@ -132,49 +130,40 @@ public class CybService extends Service {
 
 		// receivers
 		bcr_hs.put(wifi, new BroadcastReceiver() {
-
 			@Override
 			public void onReceive(Context context, Intent intent) {
-				/*if (intent.getBooleanExtra(
-						WifiManager.EXTRA_SUPPLICANT_CONNECTED, false)) {
-					dispatch(top, wifiConnected);
-				} else {
-					dispatch(top, wifiDisconnected);
-				}*/
-
-				if (intent.getAction().equals(
-						ConnectivityManager.CONNECTIVITY_ACTION)) {
-					if (Methods.isWifiConnected(context)) {
-
-						if (!get(wifi)) {
+				if (intent.getAction().equals(ConnectivityManager.CONNECTIVITY_ACTION)) {
+					if (Methods.isWifiConnected(context) ) {
+						//wifi connected
+						if(get(wifiLocha)){
+							if(!get(wifiLochaThikKaring)){
+								set(wifiLochaThikKaring,true);
+								dispatch(top, wifiKaLochaTheekKaro);
+							}
+						}
+						else if (!get(wifi)){
 							set(wifi, true);
 							dispatch(top, wifiConnected);
 						}
 
-					} else if (get(wifi)) {
-						set(wifi, false);
-						dispatch(top, wifiDisconnected);
-					}
-				}
-			}
-		});
-
-		bcr_hs.put(wifiLocha, new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				// TODO Auto-generated method stub
-				if (intent.getAction().equals(
-						ConnectivityManager.CONNECTIVITY_ACTION)) {
-					if (Methods.isWifiConnected(context)) {
-						if (!get(wifiForLocha)) {
-							set(wifiForLocha, true);
-							dispatch(top, wifiKaLochaTheekKaro);
+					} else { //wifi disc
+						
+						if(get(wifiLocha)){
+							if(get(wifiLochaThikKaring)){
+								set(wifiLochaThikKaring,false);
+								dispatch(top, wifiKaLochaGaya);
+							}
 						}
-
+						else if (get(wifi)){
+							set(wifi, false);
+							dispatch(top, wifiDisconnected);
+						}
+						
 					}
 				}
 			}
 		});
+
 		bcr_hs.put(str, new BroadcastReceiver() {
 
 			@Override
@@ -334,8 +323,7 @@ public class CybService extends Service {
 
 	private void dispatch(Const level, Const command) {
 		Log.wtf("dispatch", level.name() + " " + command.name());
-		Toast.makeText(getApplicationContext(), level + "   " + command,
-				Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplicationContext(), level + "   " + command,Toast.LENGTH_SHORT).show();
 		switch (level) {
 		case top:
 			switch (command) {
@@ -347,7 +335,7 @@ public class CybService extends Service {
 			case stop:
 				if (get(isRunning)) {
 					set(isRunning, false);
-					dispatch(wifi, command);
+					dispatch(wifi, stop);
 				}
 				break;
 			case enable:
@@ -381,7 +369,7 @@ public class CybService extends Service {
 			switch (command) {
 			case stop:
 				receiver(wifi, false);
-				startForeground(5461,InformGui.updateGuiStatus(this,stop));
+				handleGuiStatus(stop);
 			case wifiDisconnected:
 				// InformGui.updateGuiStatus(wifiDisconnected, true);
 			case wifiConnected:
@@ -394,23 +382,22 @@ public class CybService extends Service {
 					dispatch(net, command);
 				} else {
 					Toast.makeText(this,"wifidisconnected",Toast.LENGTH_SHORT).show();
-					startForeground(5461,InformGui.updateGuiStatus(this,wifiDisconnected));
+					handleGuiStatus(wifiDisconnected);
 					receiver(wifi, true);
 				}
 				break;
 			case wifiKaLochaAaya:
-				receiver(wifi, false);
-				receiver(wifiLocha, true);
+				set(wifiLocha, true);
 				execute(wifi, true, this);
-				startForeground(5461,InformGui.updateGuiStatus(this,wifiKaLochaAaya));
+				handleGuiStatus(wifiKaLochaAaya);
 				break;
 			case wifiKaLochaTheekKaro:
 				dispatch(net, wifiKaLochaTheekKaro);
-				startForeground(5461,InformGui.updateGuiStatus(this,wifiDisconnected));
-				receiver(wifiLocha, false);
 				execute(wifi, false, this);
-				set(wifiForLocha, false);
-				receiver(wifi, true);
+				break;
+			case wifiKaLochaGaya:
+				set(wifiLocha, false);
+				handleGuiStatus(wifiDisconnected);
 				break;
 			case wifiKaBahotBadaLocha:
 				// don't know
@@ -443,7 +430,7 @@ public class CybService extends Service {
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
 					// set(cyberLess, true);
 					set(net, true);
-					startForeground(5461,InformGui.updateGuiStatus(this,otherWifi));
+					handleGuiStatus(otherWifi);
 					// inform that cyberless login or another wifi
 				} else {
 					dispatch(str, command);
@@ -469,10 +456,10 @@ public class CybService extends Service {
 			case netRecheck:
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
 					set(net, true);
-					startForeground(5461,InformGui.updateGuiStatus(this,loggedIn));
+					handleGuiStatus(loggedIn);
 				} else {
 					set(net, false);
-					startForeground(5461,InformGui.updateGuiStatus(this,noNet));
+					handleGuiStatus(noNet);
 				}
 				break;
 
@@ -499,7 +486,7 @@ public class CybService extends Service {
 					dispatch(c, command);
 
 				} else {
-					startForeground(5461,InformGui.updateGuiStatus(this,lowSTR));
+					handleGuiStatus(lowSTR);
 					receiver(str, true);
 				}
 				return;
@@ -540,7 +527,6 @@ public class CybService extends Service {
 
 				if (!get(c))
 					set(c, true);
-
 				switch (command) {
 				case stop:
 					set(c, false);
@@ -572,12 +558,12 @@ public class CybService extends Service {
 				case highSTR:
 				case reLogin:
 					timer(c, true);
-					startForeground(5461,InformGui.updateGuiStatus(this,noCyb));
+					handleGuiStatus(noCyb);
 					break;
 
 				case lowSTR:
 				case wifiKaLochaTheekKaro:
-					startForeground(5461,InformGui.updateGuiStatus(this,wifiKaBahotBadaLocha));
+					handleGuiStatus(wifiKaBahotBadaLocha);
 					dispatch(top, wifiKaBahotBadaLocha);
 					timer(c, false);
 					break;
@@ -609,7 +595,7 @@ public class CybService extends Service {
 				if (get(l)) {
 					Methods.attemptLogout(getApplicationContext(),
 							Vars.loginId, Vars.password);
-					startForeground(5461,InformGui.updateGuiStatus(this,loggedOutLessStrength));
+					handleGuiStatus(loggedOutLessStrength);
 					set(l, false);
 				}
 				break;
@@ -633,22 +619,23 @@ public class CybService extends Service {
 						set(maxLogin, false);
 						set(l, true);
 						timer(l, true);
-						startForeground(5461,InformGui.updateGuiStatus(this,loggedIn));
+						handleGuiStatus(loggedIn);
 						dispatch(top, netRecheck);
 					} else {
 						set(l, false);
 						switch (result) {
 						case maxLogin:
 							set(maxLogin, true);
-							startForeground(5461,InformGui.updateGuiStatus(this,loginFailed));
+							handleGuiStatus(loginFailed);
 							timer(lF, true);
 							break;
 						case noUser:
-							startForeground(5461,InformGui.updateGuiStatus(this,noUser));
+							handleGuiStatus(noUser);
 							set(noUser, true);
+							dispatch(top, stop);
 							break;
 						case wrongIdPwd:
-							startForeground(5461,InformGui.updateGuiStatus(this,loginFailed));
+							handleGuiStatus(loginFailed);
 							dispatch(top, wrongIdPwd);
 							break;
 						}
@@ -669,7 +656,7 @@ public class CybService extends Service {
 				if (get(l))
 					dispatch(top, wifiKaLochaAaya);
 				else
-					startForeground(5461,InformGui.updateGuiStatus(this,wifiDisconnected));
+					handleGuiStatus(wifiDisconnected);
 				break;
 			default:
 				break;
@@ -723,32 +710,8 @@ public class CybService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Vars.isloggedIn = false;
 		Vars.loginId = null;
-
-		/*
-		<<<<<<< HEAD
-		 * if (action == "android.intent.action.BOOT_COMPLETED")
-		 * InformGui.Notify("Boot completed", getApplicationContext());
-		 */
-		/*
-		 * connection = Static.getConnectivityStatus(getApplicationContext());
-		 * if (connection == 0) InformGui.Notify("No data connection available",
-		 * getApplicationContext()); else if (connection == 2) {
-		 * InformGui.Notify("Using Data connection", getApplicationContext());
-		 * Toast.makeText(getApplicationContext(), "Using Data connection",
-		 * Toast.LENGTH_SHORT).show();// mobile connection } else { if
-		 * (Static.isCyberoamAvailbale()) { if (attemptLogin()) {
-		 * InformGui.Notify("Logged in by " + Static.loginId,
-		 * getApplicationContext()); InformGui.loggedIn(getApplicationContext(),
-		 * Static.loginId); timer.schedule(task, Static.loginInterval,
-		 * Static.loginInterval); } else { InformGui.Notify("Logged failed",
-		 * getApplicationContext());
-		 * InformGui.loginFailed(getApplicationContext()); } } else { // using
-		 * some other wifi or because the wifi strength is less
-		 * InformGui.Notify("Supreme can't be reached",
-		 * getApplicationContext()); } }
-		 */
-		// getApplicationContext();
-
+		
+		
 		StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder()
 				.permitAll().build();
 
@@ -760,5 +723,8 @@ public class CybService extends Service {
 
 	}
 
+	private void handleGuiStatus(Const key){
+		startForeground(notiId,InformGui.updateGuiStatus(key,this));
+	}
 	
 }

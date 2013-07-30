@@ -2,6 +2,8 @@ package com.netsavvies.cyberoam.backend;
 
 import java.util.Hashtable;
 
+import android.widget.Button;
+
 import com.netsavvies.cyberoam.R;
 
 import static com.netsavvies.cyberoam.backend.Const.*;
@@ -37,8 +39,6 @@ public class Vars {
 	static final String cyberlessMessage = "You are already logged in as a clientless user";
 	static final String maxloginMessage = "You have reached Maximum Login Limit.";
 	
-	
-	
 	//strings/messages
 	
 	static final public Hashtable<Const,String> strings;
@@ -49,7 +49,14 @@ public class Vars {
 	public static boolean isloggedIn;
 	static String password;
 
-	//public static int imageid;
+
+	//current status message
+	public static  int currIcon;
+	public static String currBtn;
+	public static String currMsg;
+	
+	//Constants
+	public static final short notiId = 5461; //shrapa lpgic :/
 
 	static {
 		bool_hs = new Hashtable<Const, Boolean>();

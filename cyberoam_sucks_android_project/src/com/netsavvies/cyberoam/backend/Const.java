@@ -1,77 +1,78 @@
 package com.netsavvies.cyberoam.backend;
 
 public enum Const {
-	// booleans, dispatch levels 
-	top,
-	wifi,
-	wifiForLocha,
-	net,
-	str,
-	c,
-	l,
-	lF,
+	//booleans, dispatch levels, timers
+		top,
+		wifi,
+		wifiLocha,
+		wifiLochaThikKaring,
+		net,
+		str,
+		c,
+		l,
+		lF, //timer
+		
+		//bools
+		isRunning,
+		isDisabled,
+		cyberLess,
 	
-	isRunning,
-	isDisabled,
-	cyberLess,
 	
 	
+	//commands
+		//TOP
+		start,
+		restart,
+		stop,
+		disable,
+		enable,
+		init,
+		
+		//wifi
+		wifiConnected,
+		wifiDisconnected,
+		wifiKaLochaAaya,
+		wifiKaLochaGaya,
+		wifiKaLochaTheekKaro,
+		wifiKaBahotBadaLocha,
 	
-	//messages
-	//TOP
-	start,
-	restart,
-	stop,
-	disable,
-	enable,
-	init,
+		//net
+		noNet,
+		netRecheck,
+		netCheck,
+		cybPage,
 	
-	//wifi
-	wifiConnected,
-	wifiDisconnected,
-	wifiKaLochaAaya,
-	wifiKaLochaTheekKaro,
-	wifiKaBahotBadaLocha,
-
-	//net
-	noNet,
-	netRecheck,
-	netCheck,
-	cybPage,
-
-	//str
-	highSTR,
-	lowSTR,
-	strChange,
-
-	//C
-	noCyb,
-	cybCheck,
-
-	//L
-	notLoggedIn ,
-	maxLogin ,
-	reLogin ,
-	wrongIdPwd,
-    loggedIn,
+		//str
+		highSTR,
+		lowSTR,
+		strChange,
+	
+		//C
+		noCyb,
+		cybCheck,
+	
+		//L
+		notLoggedIn ,
+		maxLogin ,
+		reLogin ,
+		wrongIdPwd,
+	    loggedIn,
 	
 	//receivers
-	//wifi
-	wifiLocha,
-	wifiLochaKhatam,
 	
 	
 
 	// other variables
-	noUser,
-	notChecked,
+		noUser,
+		notChecked,
 	
 	
-	//messages
-	otherWifi,
-	loginFailed,
-	loggedOutLessStrength,
-	current;
+	//status messages,strings
+		otherWifi,
+		loginFailed,
+		loggedOutLessStrength,
+		current,
+		notiTitle;
 	
 	
 }
