@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.view.Gravity;
 import android.widget.Toast;
+import android.app.Service;
 
 import static com.netsavvies.cyberoam.backend.Methods.*;
 import static com.netsavvies.cyberoam.backend.Vars.*;
@@ -29,7 +30,7 @@ public class InformGui {
 	private static String logoutmessage = "You are logged out";
 	private static String loginfailed = "Login failed due to maximum login limit or due to wrong password";
 
-	public static void Notify(String subject, Context context,int icon) {
+	public static Notification Notify(String subject, Context context,int icon) {
 
 		Intent intent = new Intent(context, StatusActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -39,7 +40,7 @@ public class InformGui {
 		
 		// Bitmap largeIcon =
 		// BitmapFactory.decodeResource(context.getResources(),R.drawable.large);
-		Toast.makeText(context,"Notify"+getMessage(current),Toast.LENGTH_SHORT).show();
+		//Toast.makeText(context,"Notify"+getMessage(current),Toast.LENGTH_SHORT).show();
 		Notification noti = new NotificationCompat.Builder(context)
 				.setContentTitle("Internet Connection Status")
 				.setContentText(subject).setSmallIcon(icon)
@@ -48,14 +49,16 @@ public class InformGui {
 		NotificationManager notificationManager = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
+	   
 		// Do not Hide the notification after its selected
 		noti.flags |= Notification.FLAG_NO_CLEAR;
 		// Let the notification be ongoing
 		noti.flags |= Notification.FLAG_ONGOING_EVENT;
 		// Let the notification be ongoing
 		noti.flags |= Notification.FLAG_FOREGROUND_SERVICE;
-		notificationManager.notify(0, noti);
-		Toast.makeText(context,"Notified"+getMessage(current),Toast.LENGTH_SHORT).show();
+	     
+		
+		return noti;
 	}
 
 	public static void loggedIn(Context context, String id) {
@@ -157,47 +160,21 @@ public class InformGui {
 		}
 	}*/
 	
-	public static void updateGuiStatus(Context context,Const key) 
+	public static Notification updateGuiStatus(Context context,Const key) 
 	{
 		if(key.equals(loggedIn))
 			strings.put(current,getMessage(key)+Vars.loginId);
 		else
 		strings.put(current, getMessage(key));
-		Toast.makeText(context,getMessage(current)+R.drawable.ic_launcher,Toast.LENGTH_SHORT).show();
+		//Toast.makeText(context,getMessage(current)+R.drawable.ic_launcher,Toast.LENGTH_SHORT).show();
 		icons.put(current, getIcon(key));
 		buttons.put(current, getButton(key));
-		Notify(getMessage(current),context,getIcon(current));
+		return Notify(getMessage(current),context,getIcon(current));
 	}
 		
 	
 	
-	public static Notification getForeNoti(Context context)
-	{
-		Intent intent = new Intent(context, StatusActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		PendingIntent pIntent = PendingIntent
-				.getActivity(context, 0, intent, 0);
-
-		
-		// Bitmap largeIcon =
-		// BitmapFactory.decodeResource(context.getResources(),R.drawable.large);
-		Toast.makeText(context,"Notify"+getMessage(current),Toast.LENGTH_SHORT).show();
-		Notification noti = new NotificationCompat.Builder(context)
-				.setContentTitle("Internet Connection Status")
-				.setContentText("Starting service").setSmallIcon(R.drawable.ic_launcher)
-				.setContentIntent(pIntent).build();
-    
-		NotificationManager notificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-
-		// Do not Hide the notification after its selected
-		noti.flags |= Notification.FLAG_NO_CLEAR;
-		// Let the notification be ongoing
-		noti.flags |= Notification.FLAG_ONGOING_EVENT;
-		// Let the notification be ongoing
-		noti.flags |= Notification.FLAG_FOREGROUND_SERVICE;
-		return noti;
-	}
+	
 		
 
 	

@@ -62,7 +62,9 @@ public class CybService extends Service {
 	// all commands
 
 	private void init() {
-		startForeground(0,InformGui.getForeNoti(this));
+		
+		
+		
 		run_hs = new Hashtable<Const, Runnable>();
 		runExist_hs = new Hashtable<Const, Boolean>();
 		bcr_hs = new Hashtable<Const, BroadcastReceiver>();
@@ -379,7 +381,7 @@ public class CybService extends Service {
 			switch (command) {
 			case stop:
 				receiver(wifi, false);
-				InformGui.updateGuiStatus(this,stop);
+				startForeground(5461,InformGui.updateGuiStatus(this,stop));
 			case wifiDisconnected:
 				// InformGui.updateGuiStatus(wifiDisconnected, true);
 			case wifiConnected:
@@ -392,7 +394,7 @@ public class CybService extends Service {
 					dispatch(net, command);
 				} else {
 					Toast.makeText(this,"wifidisconnected",Toast.LENGTH_SHORT).show();
-					InformGui.updateGuiStatus(this,wifiDisconnected);
+					startForeground(5461,InformGui.updateGuiStatus(this,wifiDisconnected));
 					receiver(wifi, true);
 				}
 				break;
@@ -400,11 +402,11 @@ public class CybService extends Service {
 				receiver(wifi, false);
 				receiver(wifiLocha, true);
 				execute(wifi, true, this);
-				InformGui.updateGuiStatus(this,wifiKaLochaAaya);
+				startForeground(5461,InformGui.updateGuiStatus(this,wifiKaLochaAaya));
 				break;
 			case wifiKaLochaTheekKaro:
 				dispatch(net, wifiKaLochaTheekKaro);
-				InformGui.updateGuiStatus(this,wifiDisconnected);
+				startForeground(5461,InformGui.updateGuiStatus(this,wifiDisconnected));
 				receiver(wifiLocha, false);
 				execute(wifi, false, this);
 				set(wifiForLocha, false);
@@ -441,7 +443,7 @@ public class CybService extends Service {
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
 					// set(cyberLess, true);
 					set(net, true);
-					InformGui.updateGuiStatus(this,otherWifi);
+					startForeground(5461,InformGui.updateGuiStatus(this,otherWifi));
 					// inform that cyberless login or another wifi
 				} else {
 					dispatch(str, command);
@@ -467,10 +469,10 @@ public class CybService extends Service {
 			case netRecheck:
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
 					set(net, true);
-					InformGui.updateGuiStatus(this,loggedIn);
+					startForeground(5461,InformGui.updateGuiStatus(this,loggedIn));
 				} else {
 					set(net, false);
-					InformGui.updateGuiStatus(this,noNet);
+					startForeground(5461,InformGui.updateGuiStatus(this,noNet));
 				}
 				break;
 
@@ -497,7 +499,7 @@ public class CybService extends Service {
 					dispatch(c, command);
 
 				} else {
-					InformGui.updateGuiStatus(this,lowSTR);
+					startForeground(5461,InformGui.updateGuiStatus(this,lowSTR));
 					receiver(str, true);
 				}
 				return;
@@ -570,12 +572,12 @@ public class CybService extends Service {
 				case highSTR:
 				case reLogin:
 					timer(c, true);
-					InformGui.updateGuiStatus(this,noCyb);
+					startForeground(5461,InformGui.updateGuiStatus(this,noCyb));
 					break;
 
 				case lowSTR:
 				case wifiKaLochaTheekKaro:
-					InformGui.updateGuiStatus(this,wifiKaBahotBadaLocha);
+					startForeground(5461,InformGui.updateGuiStatus(this,wifiKaBahotBadaLocha));
 					dispatch(top, wifiKaBahotBadaLocha);
 					timer(c, false);
 					break;
@@ -607,7 +609,7 @@ public class CybService extends Service {
 				if (get(l)) {
 					Methods.attemptLogout(getApplicationContext(),
 							Vars.loginId, Vars.password);
-					InformGui.updateGuiStatus(this,loggedOutLessStrength);
+					startForeground(5461,InformGui.updateGuiStatus(this,loggedOutLessStrength));
 					set(l, false);
 				}
 				break;
@@ -631,22 +633,22 @@ public class CybService extends Service {
 						set(maxLogin, false);
 						set(l, true);
 						timer(l, true);
-						InformGui.updateGuiStatus(this,loggedIn);
+						startForeground(5461,InformGui.updateGuiStatus(this,loggedIn));
 						dispatch(top, netRecheck);
 					} else {
 						set(l, false);
 						switch (result) {
 						case maxLogin:
 							set(maxLogin, true);
-							InformGui.updateGuiStatus(this,loginFailed);
+							startForeground(5461,InformGui.updateGuiStatus(this,loginFailed));
 							timer(lF, true);
 							break;
 						case noUser:
-							InformGui.updateGuiStatus(this,noUser);
+							startForeground(5461,InformGui.updateGuiStatus(this,noUser));
 							set(noUser, true);
 							break;
 						case wrongIdPwd:
-							InformGui.updateGuiStatus(this,loginFailed);
+							startForeground(5461,InformGui.updateGuiStatus(this,loginFailed));
 							dispatch(top, wrongIdPwd);
 							break;
 						}
@@ -667,7 +669,7 @@ public class CybService extends Service {
 				if (get(l))
 					dispatch(top, wifiKaLochaAaya);
 				else
-					InformGui.updateGuiStatus(this,wifiDisconnected);
+					startForeground(5461,InformGui.updateGuiStatus(this,wifiDisconnected));
 				break;
 			default:
 				break;
