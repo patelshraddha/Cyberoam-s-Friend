@@ -165,7 +165,6 @@ public class CybService extends Service {
 		});
 
 		bcr_hs.put(str, new BroadcastReceiver() {
-
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if (intent.getAction().equals(WifiManager.RSSI_CHANGED_ACTION)) {
@@ -188,7 +187,8 @@ public class CybService extends Service {
 		bcrExist_hs.put(wifi, false);
 		bcrExist_hs.put(wifiLocha, false);
 		bcrExist_hs.put(str, false);
-
+		
+		handleGuiStatus(init);
 	}
 
 	private boolean check(Const key) {
@@ -430,7 +430,10 @@ public class CybService extends Service {
 				if (Methods.isConnectionAlive(getApplicationContext()) == 1) {
 					// set(cyberLess, true);
 					set(net, true);
-					handleGuiStatus(otherWifi);
+					if(checkCyberLess(this))
+						handleGuiStatus(cyberLess);
+					else
+						handleGuiStatus(otherWifi);
 					// inform that cyberless login or another wifi
 				} else {
 					dispatch(str, command);
@@ -584,7 +587,6 @@ public class CybService extends Service {
 
 		case l: {
 			timer(l, false);
-			set(noUser, false);
 			switch (command) {
 			case noCyb:
 				if (get(l))
@@ -630,13 +632,12 @@ public class CybService extends Service {
 							timer(lF, true);
 							break;
 						case noUser:
-							handleGuiStatus(noUser);
-							set(noUser, true);
 							dispatch(top, stop);
+							handleGuiStatus(noUser);
 							break;
 						case wrongIdPwd:
-							handleGuiStatus(loginFailed);
 							dispatch(top, wrongIdPwd);
+							handleGuiStatus(loginFailed);
 							break;
 						}
 					}
@@ -676,8 +677,9 @@ public class CybService extends Service {
 	@Override
 	public void onCreate() {
 		theHandler.handleMessage(constructHandlerMessage(init));
-
+        //TODO check this
 		super.onCreate();
+		registerReceiver(backendReceiver,new IntentFilter(restart.toString()));
 	}
 
 	@Override
@@ -704,6 +706,7 @@ public class CybService extends Service {
 		super.onDestroy();
 		Log.wtf("WTF", "destroy");
 		theHandler.handleMessage(constructHandlerMessage(stop));
+		unregisterReceiver(backendReceiver);
 	}
 
 	@Override
@@ -720,11 +723,25 @@ public class CybService extends Service {
 		theHandler.handleMessage(constructHandlerMessage(start));
 
 		return super.onStartCommand(intent, flags, startId);
-
 	}
 
 	private void handleGuiStatus(Const key){
 		startForeground(notiId,InformGui.updateGuiStatus(key,this));
+		Methods.sendBroadcast(updateGui.toString(),this); 
 	}
+	
+	private BroadcastReceiver backendReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			Const constMsg = Const.valueOf(intent.getAction());
+			switch(constMsg){
+				case restart :  
+					dispatch(top,restart);
+					break;
+				default:
+			}
+		}
+	};
+	
 	
 }

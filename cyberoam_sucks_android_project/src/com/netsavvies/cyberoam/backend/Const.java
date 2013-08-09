@@ -59,9 +59,8 @@ public enum Const {
 	    loggedIn,
 	
 	//receivers
-	
-	
-
+	    
+	    
 	// other variables
 		noUser,
 		notChecked,
@@ -72,7 +71,9 @@ public enum Const {
 		loginFailed,
 		loggedOutLessStrength,
 		current,
-		notiTitle;
+		notiTitle,
 	
+		//gui commands
+		updateGui;
 	
 }

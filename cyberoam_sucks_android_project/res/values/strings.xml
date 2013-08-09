@@ -9,5 +9,6 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="delete_settings">Delete all users</string>
+    <string name="change_password_dialog_title">Change password</string>
 
 </resources>

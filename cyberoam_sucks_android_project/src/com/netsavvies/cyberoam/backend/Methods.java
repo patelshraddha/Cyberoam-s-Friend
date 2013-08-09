@@ -1,40 +1,49 @@
 package com.netsavvies.cyberoam.backend;
 
-import static com.netsavvies.cyberoam.backend.Vars.*;
-import static com.netsavvies.cyberoam.backend.Const.*;
+import static com.netsavvies.cyberoam.backend.Const.cyberLess;
+import static com.netsavvies.cyberoam.backend.Const.loggedIn;
+import static com.netsavvies.cyberoam.backend.Const.maxLogin;
+import static com.netsavvies.cyberoam.backend.Const.noUser;
+import static com.netsavvies.cyberoam.backend.Const.notChecked;
+import static com.netsavvies.cyberoam.backend.Const.wrongIdPwd;
+import static com.netsavvies.cyberoam.backend.Vars.bool_hs;
+import static com.netsavvies.cyberoam.backend.Vars.buttons;
+import static com.netsavvies.cyberoam.backend.Vars.cyberlessMessage;
+import static com.netsavvies.cyberoam.backend.Vars.icons;
+import static com.netsavvies.cyberoam.backend.Vars.loginMessage;
+import static com.netsavvies.cyberoam.backend.Vars.logoutMessage;
+import static com.netsavvies.cyberoam.backend.Vars.maxloginMessage;
+import static com.netsavvies.cyberoam.backend.Vars.strings;
+import static com.netsavvies.cyberoam.backend.Vars.wrongIdpwdmessage;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
-import com.netsavvies.cyberoam.R;
-import com.netsavvies.cyberoam.gui.InformGui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -43,11 +52,13 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.netsavvies.cyberoam.R;
+
 public class Methods {
 	private static ArrayList<UserDetails> data;
 	private static int position;
 
-	static void execute(Const key, boolean bool, Context ctx) {
+	public static void execute(Const key, boolean bool, Context ctx) {
 		Log.wtf("Execute", key.name() + " " + bool);
 		switch (key) {
 		case wifi:
@@ -58,7 +69,6 @@ public class Methods {
 	static void set(Const key, Boolean bool) {
 		Log.wtf("set", key.name() + " " + bool);
 		bool_hs.put(key, bool);
-		// InformGui.updateGuiStatus(key,bool);
 	}
 
 	public static boolean get(Const key) {
@@ -72,24 +82,37 @@ public class Methods {
 	}
 
 	public static String getMessage(Const key) {
+		// try {
 		if (strings.containsKey(key))
 			return strings.get(key);
 		else
 			return null;
+		// } catch (NullPointerException e) {
+		// return null;
+		// }
 	}
 
 	public static int getIcon(Const key) {
-		if (icons.containsKey(key))
-			return icons.get(key);
-		else
+		try {
+			if (icons.containsKey(key))
+				return icons.get(key);
+			else
+				return R.drawable.ic_launcher;
+		} catch (NullPointerException e) {
 			return R.drawable.ic_launcher;
+		}
+
 	}
 
 	public static String getButton(Const key) {
-		if (buttons.containsKey(key))
-			return buttons.get(key);
-		else
+		try {
+			if (buttons.containsKey(key))
+				return buttons.get(key);
+			else
+				return "NA";
+		} catch (NullPointerException e) {
 			return "NA";
+		}
 
 	}
 
@@ -152,64 +175,32 @@ public class Methods {
 
 	static int isConnectionAlive(Context context) {
 		if (!isWifiConnected(context))
-			return 0;
+			return 2;
 
-		String message = "";
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpPost client = new HttpPost("http://playpowerlabs.org/");
+		HttpParams httpParameters = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpParameters,
+				Vars.timeoutConnection);
+		HttpConnectionParams.setSoTimeout(httpParameters, Vars.timeoutSocket);
+		String message = null;
+		HttpClient httpClient = new DefaultHttpClient(httpParameters);
 
 		try {
-			HttpResponse response = httpclient.execute(client);
-			HttpEntity r_entity = response.getEntity();
-			String xmlString = EntityUtils.toString(r_entity);
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder db = factory.newDocumentBuilder();
-			InputSource inStream = new InputSource();
-			inStream.setCharacterStream(new StringReader(xmlString));
-			Document doc = db.parse(inStream);
-			NodeList nl = doc.getElementsByTagName("body");
-			for (int i = 0; i < nl.getLength(); i++) {
-				if (nl.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-					org.w3c.dom.Element nameElement = (org.w3c.dom.Element) nl
-							.item(i);
-					message = nameElement.getFirstChild().getNodeValue().trim();
-				}
-
-			}
+			HttpGet method = new HttpGet(new URI(Vars.netCheckurl));
+			HttpResponse response = httpClient.execute(method);
+			message = parse(response, "title");
+		} catch (URISyntaxException e) {
+			return 2;
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			return 2;
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-
-			e.printStackTrace();
-		} catch (SAXException e) {
-
-			e.printStackTrace();
-
+			return 2;
 		}
-
-		if (message.equals("Playpower Labs"))
+		if (message.equals(Vars.netPageTitle))
 			return 1;
-		else {
-			HttpURLConnection urlc;
-
-			try {
-				urlc = (HttpURLConnection) (new URL("http://playpowerlabs.org/")
-						.openConnection());
-
-				urlc.connect();
-				if (!(urlc.getResponseCode() == 200))
-					return 0;
-				else
-					return 2;
-
-			} catch (IOException e) {
-				Log.e("Problem", "Error checking internet connection", e);
-				return 2;
-			}
-		}
+		else if (message.equals(Vars.cybPageTitle))
+			return 0;
+		else
+			return 2;
 
 	}
 
@@ -254,11 +245,11 @@ public class Methods {
 	public static void attemptLogout(Context context, String loginid,
 			String loginpassword) {
 
-		while (contactServer("193", loginid, loginpassword, context).equals(
+		while (!contactServer("193", loginid, loginpassword, context).equals(
 				logoutMessage)) {
 			Log.wtf("logoutMsg", "Not logged out");
 		}
-		Log.wtf("logourMsg", "logged out");
+
 		Vars.isloggedIn = false;
 		Vars.loginId = null;
 	}
@@ -347,36 +338,16 @@ public class Methods {
 			client.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
+			return null;
 		}
+		HttpResponse response;
 		try {
-			HttpResponse response = httpclient.execute(client);
-			HttpEntity r_entity = response.getEntity();
-			String xmlString = EntityUtils.toString(r_entity);
-			DocumentBuilderFactory factory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder db = factory.newDocumentBuilder();
-			InputSource inStream = new InputSource();
-			inStream.setCharacterStream(new StringReader(xmlString));
-			Document doc = db.parse(inStream);
-			NodeList nl = doc.getElementsByTagName("message");
-			for (int i = 0; i < nl.getLength(); i++) {
-				if (nl.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
-					org.w3c.dom.Element nameElement = (org.w3c.dom.Element) nl
-							.item(i);
-					message = nameElement.getFirstChild().getNodeValue().trim();
-				}
+			response = httpclient.execute(client);
 
-			}
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			return null;
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ParserConfigurationException e) {
-
-			e.printStackTrace();
-		} catch (SAXException e) {
-
-			e.printStackTrace();
+			return null;
 		}
 		return message;
 	}
@@ -390,4 +361,33 @@ public class Methods {
 		return msg;
 
 	}
+
+	public static boolean checkCyberLess(Context context) {
+		if (contactServer("191", "200901567", "A", context).equals(
+				Vars.cyberlessMessage))
+			return true;
+		else
+			return false;
+	}
+
+	private static String parse(HttpResponse response, String tag) {
+		HttpEntity r_entity = response.getEntity();
+		String xmlString;
+		try {
+			xmlString = EntityUtils.toString(r_entity);
+		} catch (ParseException e) {
+			return null;
+		} catch (IOException e) {
+			return null;
+		}
+		int length = tag.length() + 2;
+		int start = xmlString.lastIndexOf("<" + tag + ">");
+		int end = xmlString.lastIndexOf("</" + tag + ">");
+		return xmlString.substring(start + length, end);
+	}
+
+	public static void sendBroadcast(String str, Context context) {
+		context.sendBroadcast(new Intent(str));
+	}
+
 }

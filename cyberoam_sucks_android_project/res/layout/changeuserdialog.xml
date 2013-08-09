@@ -1,29 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#ffffff"
     android:orientation="vertical"
     android:weightSum="100" >
 
-    <EditText
-        android:id="@+id/userid"
+    <TextView
+        android:id="@+id/id_user"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:hint="@string/useridinput"
         android:textSize="15sp" />
 
     <EditText
-        android:id="@+id/userpassword"
-        android:layout_width="match_parent"
+        android:id="@+id/password_user"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="20dp"
         android:layout_marginBottom="20dp"
         android:layout_marginTop="20dp"
         android:gravity="center"
-        android:hint="@string/userpassword"
         android:inputType="textPassword"
         android:textSize="15sp" />
 
@@ -31,17 +30,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="100" >
+        android:weightSum="100">
 
         <Button
-            android:id="@+id/save"
+            android:id="@+id/save_button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="50"
             android:text="@string/save" />
 
         <Button
-            android:id="@+id/cancel"
+            android:id="@+id/cancel_button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="50"

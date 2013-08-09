@@ -39,6 +39,11 @@ public class Vars {
 	static final String cyberlessMessage = "You are already logged in as a clientless user";
 	static final String maxloginMessage = "You have reached Maximum Login Limit.";
 	
+	static final String netCheckurl = "http://www.whatismyip.org/";
+	static final String netPageTitle="What is my ip? - WhatIsMyIp.org";
+	static final String cybPageTitle="";
+	static final int timeoutConnection=5000;
+	static final int timeoutSocket = 5000;
 	//strings/messages
 	
 	static final public Hashtable<Const,String> strings;
@@ -47,12 +52,12 @@ public class Vars {
 	// user data
 	public static String loginId;
 	public static boolean isloggedIn;
-	static String password;
+	public static String password;
 
 
 	//current status message
 	public static  int currIcon;
-	public static String currBtn;
+	public static Const currStatusKey;
 	public static String currMsg;
 	
 	//Constants
@@ -65,6 +70,12 @@ public class Vars {
 		buttons=new Hashtable<Const,String>();
 		
 		//putting messages
+		
+		strings.put(init,"Starting service...");
+		icons.put(init,R.drawable.ic_launcher);
+		buttons.put(init,"NA");
+		
+		
 		strings.put(wifiDisconnected,"Wifi disconnected");
 		icons.put(wifiDisconnected,R.drawable.ic_launcher);
 		buttons.put(wifiDisconnected,"Turn on wifi");
@@ -94,7 +105,6 @@ public class Vars {
 		icons.put(wifiKaBahotBadaLocha,R.drawable.ic_launcher);
 		buttons.put(wifiKaBahotBadaLocha,"NA");
 		
-		
 		strings.put(noCyb,"Not able to login because cyberoam not available");
 		icons.put(noCyb,R.drawable.ic_launcher);
 		buttons.put(noCyb,"NA");
@@ -109,7 +119,7 @@ public class Vars {
 		
 		strings.put(loginFailed,"Login failed.");
 		icons.put(loginFailed,R.drawable.ic_launcher);
-		buttons.put(loginFailed,"NA");
+		buttons.put(loginFailed,"Change Prefrences");
 		
 		strings.put(stop,"Service stopped.");
 		icons.put(stop,R.drawable.ic_launcher);

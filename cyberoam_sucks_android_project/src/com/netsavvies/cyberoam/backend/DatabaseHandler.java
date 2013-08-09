@@ -130,13 +130,23 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 				+ userDetails.getPriority(), null);
 		db.close();
 	}
+	
+	// Updating single contact
+		public void updatePassword(int priority,String password) {
+			SQLiteDatabase db = this.getWritableDatabase();
+			ContentValues values = new ContentValues();
+			values.put(KEY_PASSWORD,password);
+			db.update(TABLE_DETAILS, values, KEY_PRIORITY + "="
+					+priority, null);
+			db.close();
+		}
 
-	public void updateChecked(UserDetails userDetails, int i) {
+	public void updateChecked(int priority, int i) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();
 		values.put(KEY_CHECKED, i);
 		db.update(TABLE_DETAILS, values, KEY_PRIORITY + "="
-				+ userDetails.getPriority(), null);
+				+priority, null);
 		db.close();
 	}
 

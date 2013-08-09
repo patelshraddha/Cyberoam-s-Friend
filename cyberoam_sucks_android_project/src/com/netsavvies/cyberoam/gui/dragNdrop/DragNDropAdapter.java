@@ -3,6 +3,7 @@ package com.netsavvies.cyberoam.gui.dragNdrop;
 import java.util.ArrayList;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
@@ -13,9 +14,14 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.TextView;
-
+import static com.netsavvies.cyberoam.gui.dragNdrop.DragNDropListActivity.change;
+import com.netsavvies.cyberoam.R;
+import com.netsavvies.cyberoam.backend.Const;
 import com.netsavvies.cyberoam.backend.DatabaseHandler;
+import com.netsavvies.cyberoam.backend.Methods;
+import com.netsavvies.cyberoam.backend.UserDetails;
 
 public final class DragNDropAdapter extends BaseAdapter implements DropListener {
 
@@ -69,7 +75,7 @@ public final class DragNDropAdapter extends BaseAdapter implements DropListener 
 		return position;
 	}
 
-	public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(final int position, View convertView, ViewGroup parent) {
 		final ViewHolder holder;
 		final int priority = position + 1;
 		if (convertView == null) {
@@ -84,6 +90,13 @@ public final class DragNDropAdapter extends BaseAdapter implements DropListener 
 			holder = (ViewHolder) convertView.getTag();
 		}
 		holder.text.setText(mContent.get(position));
+		holder.text.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				changePassword(priority);
+			}
+
+		});
 		holder.checkbox.setChecked(mcheckboxContent.get(position));
 		holder.checkbox
 				.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -93,10 +106,11 @@ public final class DragNDropAdapter extends BaseAdapter implements DropListener 
 							boolean isChecked) {
 						DatabaseHandler db = new DatabaseHandler(mcontext);
 						if (holder.checkbox.isChecked())
-							db.updateChecked(db.getUser(priority), 1);
+							db.updateChecked(priority, 1);
 						else
-							db.updateChecked(db.getUser(priority), 0);
+							db.updateChecked(priority, 0);
 						db.close();
+						change=true;
 					}
 				});
 
@@ -123,6 +137,7 @@ public final class DragNDropAdapter extends BaseAdapter implements DropListener 
 										mcheckboxContent.remove(priority - 1);
 										notifyDataSetChanged();
 										dialog.cancel();
+										change=true;
 									}
 								})
 						.setNegativeButton("No",
@@ -162,4 +177,69 @@ public final class DragNDropAdapter extends BaseAdapter implements DropListener 
 		mContent.remove(from);
 		mContent.add(to, temp);
 	}
+
+	private void changePassword(final int priority) {
+		final Context context = mcontext;
+		final Dialog dialog = new Dialog(context);
+		dialog.setContentView(R.layout.changeuserdialog);
+		dialog.setTitle(R.string.change_password_dialog_title);
+		dialog.show();
+		final Button save = (Button) dialog.findViewById(R.id.save_button);
+		final Button cancel = (Button) dialog.findViewById(R.id.cancel_button);
+		final TextView Id = (TextView) dialog.findViewById(R.id.id_user);
+		final EditText userPassword = (EditText) dialog
+				.findViewById(R.id.password_user);
+		DatabaseHandler db = new DatabaseHandler(context);
+		final UserDetails userdetails = db.getUser(priority);
+		db.close();
+		Id.setText(userdetails.getId());
+		userPassword.setText(userdetails.getPassword());
+		save.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+
+				String message = null;
+
+				if (userPassword.getText().length() == 0) {
+					message = "Empty User Password";
+
+					AlertDialog.Builder alertbuilder = new AlertDialog.Builder(
+							context);
+					alertbuilder
+							.setTitle("OOPS!!!")
+							.setMessage(message)
+							.setCancelable(false)
+							.setPositiveButton("Ok",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog, int id) {
+											dialog.cancel();
+										}
+									});
+					AlertDialog alert = alertbuilder.create();
+					alert.show();
+					dialog.dismiss();
+				} else {
+					
+					DatabaseHandler db = new DatabaseHandler(context);
+					userdetails.setPassword(userPassword.getText().toString());
+					db.updatePassword(priority, userdetails.getPassword());
+					db.close();
+					dialog.dismiss();
+					change=true;
+				}
+				
+			}
+
+		});
+
+		cancel.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				dialog.dismiss();
+			}
+		});
+	}
+
 }

@@ -21,8 +21,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.netsavvies.cyberoam.R;
+import com.netsavvies.cyberoam.backend.Const;
 import com.netsavvies.cyberoam.backend.Control;
 import com.netsavvies.cyberoam.backend.DatabaseHandler;
+import com.netsavvies.cyberoam.backend.Methods;
 import com.netsavvies.cyberoam.backend.UserDetails;
 
 public class DragNDropListActivity extends ListActivity {
@@ -31,20 +33,13 @@ public class DragNDropListActivity extends ListActivity {
 	private ArrayList<String> content;
 	private ArrayList<Boolean> checkboxcontent;
 	private DragNDropAdapter adapter;
-
+    static boolean change;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		//if(Control.isServiceRunning(this)==false)
-		//{
-		Toast.makeText(this,"HERE",Toast.LENGTH_SHORT).show();
-		Intent startServiceIntent = new Intent(this, com.netsavvies.cyberoam.backend.CybService.class);
-        startService(startServiceIntent);
-        
-        Toast.makeText(this,"Service started by login activity",Toast.LENGTH_SHORT).show();
-		//}
 		setContentView(R.layout.dragndroplistview);
-
+        change=false;
 		content = new ArrayList<String>();
 		checkboxcontent = new ArrayList<Boolean>();
 		construct();
@@ -141,6 +136,7 @@ public class DragNDropListActivity extends ListActivity {
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
+								
 								DatabaseHandler db = new DatabaseHandler(
 										context);
 								db.deleteAllUsers();
@@ -149,6 +145,7 @@ public class DragNDropListActivity extends ListActivity {
 								checkboxcontent.clear();
 								adapter.notifyDataSetChanged();
 								dialog.cancel();
+								change=true;
 							}
 						})
 				.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -207,6 +204,7 @@ public class DragNDropListActivity extends ListActivity {
 					alert.show();
 
 				} else {
+					
 					DatabaseHandler db = new DatabaseHandler(context);
 					db.addUser(new UserDetails(1000, userId.getText()
 							.toString(), userPassword.getText().toString(), 1));
@@ -223,6 +221,7 @@ public class DragNDropListActivity extends ListActivity {
 
 					adapter.notifyDataSetChanged();
 					dialog.dismiss();
+					change=true;
 				}
 			}
 		});
@@ -234,6 +233,15 @@ public class DragNDropListActivity extends ListActivity {
 			}
 		});
 
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		if(change)
+			Methods.sendBroadcast(Const.restart.toString(),this);
+		
 	}
 
 	private void construct() {
@@ -251,5 +259,14 @@ public class DragNDropListActivity extends ListActivity {
 
 		db.close();
 	}
+
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		if(change)
+			Methods.sendBroadcast(Const.restart.toString(),this);
+	}
+	
+	
 
 }

@@ -1,14 +1,8 @@
 package com.netsavvies.cyberoam.gui;
 
-import static com.netsavvies.cyberoam.backend.Const.loggedIn;
-import static com.netsavvies.cyberoam.backend.Const.notiTitle;
-import static com.netsavvies.cyberoam.backend.Methods.getButton;
-import static com.netsavvies.cyberoam.backend.Methods.getIcon;
-import static com.netsavvies.cyberoam.backend.Methods.getMessage;
-import static com.netsavvies.cyberoam.backend.Vars.currBtn;
-import static com.netsavvies.cyberoam.backend.Vars.currIcon;
-import static com.netsavvies.cyberoam.backend.Vars.currMsg;
-import static com.netsavvies.cyberoam.backend.Vars.strings;
+import static com.netsavvies.cyberoam.backend.Const.*;
+import static com.netsavvies.cyberoam.backend.Methods.*;
+import static com.netsavvies.cyberoam.backend.Vars.*;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -41,7 +35,7 @@ public class InformGui {
 		
 		currIcon = getIcon(key);
 
-		currBtn = getButton(key);
+		currStatusKey = key;
 		
 		Intent intent = new Intent(context, StatusActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -72,6 +66,7 @@ public class InformGui {
 		currentNoti.flags |= Notification.FLAG_ONGOING_EVENT;
 		// Let the notification be ongoing
 		currentNoti.flags |= Notification.FLAG_FOREGROUND_SERVICE;
+		
 		
 		return currentNoti;
 	}

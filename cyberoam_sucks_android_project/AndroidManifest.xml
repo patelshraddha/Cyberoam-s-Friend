@@ -15,10 +15,12 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
+        android:name="com.netsavvies.cyberoam.backend.CybApp"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme" 
+        android:debuggable="true">
         <service
             android:name="com.netsavvies.cyberoam.backend.CybService"
             android:enabled="true" />
@@ -28,9 +30,9 @@
             android:configChanges="orientation"
             android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.DRAGNDROPLISTACTIVITY"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.DEAFULT" />
             </intent-filter>
         </activity>
         <activity
@@ -38,9 +40,8 @@
             android:configChanges="orientation"
             android:label="@string/app_name" >
             <intent-filter>
-                <action android:name="android.intent.action.STATUSACTIVITY" />
-
-                <category android:name="android.intent.category.DEFAULT" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>
