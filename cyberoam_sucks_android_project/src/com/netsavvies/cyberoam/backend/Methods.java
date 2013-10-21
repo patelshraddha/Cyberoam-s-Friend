@@ -176,7 +176,7 @@ public class Methods {
 	static int isConnectionAlive(Context context) {
 		if (!isWifiConnected(context))
 			return 2;
-
+        /*
 		HttpParams httpParameters = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpParameters,
 				Vars.timeoutConnection);
@@ -201,7 +201,20 @@ public class Methods {
 			return 0;
 		else
 			return 2;
-
+      */
+		 HttpParams httpParameters = new BasicHttpParams();         
+	        HttpClient httpClient = new DefaultHttpClient(); 
+	        try {
+				HttpGet method = new HttpGet(new URI(Vars.netCheckurl));
+				HttpResponse response = httpClient.execute(method);
+				return parse(response,"title");
+		    } catch (URISyntaxException e) {
+				return 2;
+			} catch (ClientProtocolException e) {
+				return 2;
+			} catch (IOException e) {
+				return 2;
+			}
 	}
 
 	static boolean isStrengthEnough(Context context) {
@@ -370,20 +383,38 @@ public class Methods {
 			return false;
 	}
 
-	private static String parse(HttpResponse response, String tag) {
-		HttpEntity r_entity = response.getEntity();
-		String xmlString;
+	private static int parse(HttpResponse response, String tag) {
+		if(response==null)
+    		return 2;
+    	 HttpEntity r_entity = response.getEntity();
+         String xmlString = "xmlString";
 		try {
 			xmlString = EntityUtils.toString(r_entity);
 		} catch (ParseException e) {
-			return null;
+			return 2;
 		} catch (IOException e) {
-			return null;
+			return 2;
 		}
-		int length = tag.length() + 2;
-		int start = xmlString.lastIndexOf("<" + tag + ">");
-		int end = xmlString.lastIndexOf("</" + tag + ">");
-		return xmlString.substring(start + length, end);
+		
+		int length=tag.length()+2;
+		int start=xmlString.lastIndexOf("<"+tag+">");
+        int end=xmlString.lastIndexOf("</"+tag+">");
+        
+        if((start==-1)&&(end==-1))
+        {
+        	 String atag="SCRIPT";
+    		 length=atag.length()+2;
+    		 start=xmlString.lastIndexOf("<"+atag+">");
+             end=xmlString.lastIndexOf("</"+atag+">");
+        }
+        if(xmlString.substring(start+length, end).equals(Vars.netCheckurl))
+         return 1;
+        else
+        return 0;
+		
+		
+		
+		
 	}
 
 	public static void sendBroadcast(String str, Context context) {

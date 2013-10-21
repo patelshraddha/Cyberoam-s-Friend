@@ -628,7 +628,7 @@ public class CybService extends Service {
 						switch (result) {
 						case maxLogin:
 							set(maxLogin, true);
-							handleGuiStatus(loginFailed);
+							handleGuiStatus(maxLogin);
 							timer(lF, true);
 							break;
 						case noUser:

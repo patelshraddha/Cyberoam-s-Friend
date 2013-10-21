@@ -151,4 +151,9 @@ public class StatusActivity extends Activity {
 		super.onPause();
 	}
 
+	@Override
+	protected void onRestart() {
+		super.onRestart();
+		updateScreen();
+	}
 }

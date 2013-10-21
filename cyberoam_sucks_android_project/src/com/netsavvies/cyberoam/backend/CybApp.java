@@ -23,4 +23,41 @@ public class CybApp extends Application {
 			
 		}	
 	}
+
+	@Override
+	public void onLowMemory() {
+		super.onLowMemory();
+		if (Control.isServiceRunning(this) == false) {
+			Thread thd = new Thread(){
+				@Override
+				public void run() {
+					super.run();
+					Intent startServiceIntent = new Intent(getApplicationContext(),com.netsavvies.cyberoam.backend.CybService.class);
+					startService(startServiceIntent);
+				}
+			};
+			thd.start();
+			
+		}	
+	}
+
+	@Override
+	public void onTrimMemory(int level) {
+		super.onTrimMemory(level);
+		if (Control.isServiceRunning(this) == false) {
+			Thread thd = new Thread(){
+				@Override
+				public void run() {
+					super.run();
+					Intent startServiceIntent = new Intent(getApplicationContext(),com.netsavvies.cyberoam.backend.CybService.class);
+					startService(startServiceIntent);
+				}
+			};
+			thd.start();
+			
+		}	
+	}
+	
+	
+	
 }
