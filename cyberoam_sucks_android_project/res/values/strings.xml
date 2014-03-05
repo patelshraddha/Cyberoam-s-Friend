@@ -10,5 +10,7 @@
     <string name="cancel">Cancel</string>
     <string name="delete_settings">Delete all users</string>
     <string name="change_password_dialog_title">Change password</string>
+    <string name="change_user_prefrences">Change the user prefrences</string>
+    <string name="title_activity_main">MainActivity</string>
 
 </resources>

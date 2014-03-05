@@ -17,16 +17,25 @@ import static com.netsavvies.cyberoam.backend.Vars.strings;
 import static com.netsavvies.cyberoam.backend.Vars.wrongIdpwdmessage;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -34,14 +43,29 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningServiceInfo;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -51,6 +75,7 @@ import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+
 
 import com.netsavvies.cyberoam.R;
 
@@ -144,12 +169,12 @@ public class Methods {
 		if (!isWifiConnected(context))
 			return false;
 		HttpURLConnection urlc;
+		
 
 		try {
-			urlc = (HttpURLConnection) (new URL(
-					"http://10.100.56.55:8090/httpclient.html")
+			urlc = (HttpURLConnection) (new URL(Vars.url)
 					.openConnection());
-
+			urlc.setConnectTimeout(4000);
 			urlc.connect();
 			if (urlc.getResponseCode() == 200)
 				return true;
@@ -174,36 +199,13 @@ public class Methods {
 	}
 
 	static int isConnectionAlive(Context context) {
+		Toast.makeText(context,"Here",Toast.LENGTH_SHORT).show();
 		if (!isWifiConnected(context))
 			return 2;
-        /*
-		HttpParams httpParameters = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpParameters,
-				Vars.timeoutConnection);
-		HttpConnectionParams.setSoTimeout(httpParameters, Vars.timeoutSocket);
-		String message = null;
-		HttpClient httpClient = new DefaultHttpClient(httpParameters);
-
-		try {
-			HttpGet method = new HttpGet(new URI(Vars.netCheckurl));
-			HttpResponse response = httpClient.execute(method);
-			message = parse(response, "title");
-		} catch (URISyntaxException e) {
-			return 2;
-		} catch (ClientProtocolException e) {
-			return 2;
-		} catch (IOException e) {
-			return 2;
-		}
-		if (message.equals(Vars.netPageTitle))
-			return 1;
-		else if (message.equals(Vars.cybPageTitle))
-			return 0;
-		else
-			return 2;
-      */
-		 HttpParams httpParameters = new BasicHttpParams();         
+		 HttpParams httpParameters = new BasicHttpParams();
+		 
 	        HttpClient httpClient = new DefaultHttpClient(); 
+	    
 	        try {
 				HttpGet method = new HttpGet(new URI(Vars.netCheckurl));
 				HttpResponse response = httpClient.execute(method);
@@ -294,14 +296,14 @@ public class Methods {
 		db.close();
 		if (data.size() == 0)
 			return noUser;
-
+		
 		while (getloginId(i) != null) {
 			position++;
 			if (getChecked(i)) {
 
 				message = contactServer("191", getloginId(i),
 						getloginPassword(i), context);
-				Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+				
 				Log.wtf("loginMsg", message);
 				if (message.equals(loginMessage)) {
 					Vars.isloggedIn = true;
@@ -338,32 +340,61 @@ public class Methods {
 	}
 
 	public static String contactServer(String loginmode, String loginid,
-			String loginpassword, Context context) {
-		String url = Vars.url;
-		String message = "empty";
-		HttpClient httpclient = new DefaultHttpClient();
-		HttpPost client = new HttpPost(url);
-		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-		nvps.add(new BasicNameValuePair("mode", loginmode));
-		nvps.add(new BasicNameValuePair("username", loginid));
-		nvps.add(new BasicNameValuePair("password", loginpassword));
-		try {
-			client.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return null;
-		}
-		HttpResponse response;
-		try {
-			response = httpclient.execute(client);
+ 			String loginpassword, Context context) {
+ 		String url = Vars.url;
+ 		String message = "empty";
+ 	    DefaultHttpClient httpclient=getNewHttpClient();
+ 		HttpPost client = new HttpPost(url);
+ 		List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+ 		nvps.add(new BasicNameValuePair("mode", loginmode));
+ 		nvps.add(new BasicNameValuePair("username", loginid));
+ 		nvps.add(new BasicNameValuePair("password", loginpassword));
+ 		try {
+ 			client.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
+ 		} catch (UnsupportedEncodingException e) {
+ 			e.printStackTrace();
+ 			 
+ 		}
 
-		} catch (ClientProtocolException e) {
-			return null;
-		} catch (IOException e) {
-			return null;
-		}
-		return message;
-	}
+ 		try {
+			HttpResponse response = httpclient.execute(client);
+			HttpEntity r_entity = response.getEntity();
+			String xmlString = EntityUtils.toString(r_entity);
+			DocumentBuilderFactory factory = DocumentBuilderFactory
+					.newInstance();
+			DocumentBuilder db = factory.newDocumentBuilder();
+			InputSource inStream = new InputSource();
+			inStream.setCharacterStream(new StringReader(xmlString));
+			Document doc = db.parse(inStream);
+			
+			NodeList nl = doc.getElementsByTagName("message");
+			for (int i = 0; i < nl.getLength(); i++) {
+				if (nl.item(i).getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+					org.w3c.dom.Element nameElement = (org.w3c.dom.Element) nl
+							.item(i);
+					message = nameElement.getFirstChild().getNodeValue().trim();
+					
+				}
+			   
+ 
+			}
+ 		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+			
+ 		} catch (IOException e) {
+			e.printStackTrace();
+			
+		} catch (ParserConfigurationException e) {
+
+			e.printStackTrace();
+			
+		} catch (SAXException e) {
+
+			e.printStackTrace();
+			
+ 		}
+ 		return message;
+ 	}
 
 	public static Message constructHandlerMessage(Const cnt) {
 		Bundle bundle = new Bundle();
@@ -407,7 +438,7 @@ public class Methods {
     		 start=xmlString.lastIndexOf("<"+atag+">");
              end=xmlString.lastIndexOf("</"+atag+">");
         }
-        if(xmlString.substring(start+length, end).equals(Vars.netCheckurl))
+        if(xmlString.substring(start+length, end).equals(Vars.netPageTitle))
          return 1;
         else
         return 0;
@@ -417,8 +448,46 @@ public class Methods {
 		
 	}
 
+	
+	
+	
 	public static void sendBroadcast(String str, Context context) {
 		context.sendBroadcast(new Intent(str));
+	}
+	
+	private static DefaultHttpClient getNewHttpClient() {
+	    try {
+	        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+	        trustStore.load(null, null);
+
+	        SSLSocketFactory sf = new MySSLSocketFactory(trustStore);
+	        sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+
+	        HttpParams params = new BasicHttpParams();
+	        HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+	        HttpProtocolParams.setContentCharset(params, HTTP.UTF_8);
+
+	        SchemeRegistry registry = new SchemeRegistry();
+	        registry.register(new Scheme("http", PlainSocketFactory.getSocketFactory(), 80));
+	        registry.register(new Scheme("https", sf, 443));
+
+	        ClientConnectionManager ccm = new ThreadSafeClientConnManager(params, registry);
+
+	        return new DefaultHttpClient(ccm, params);
+	    } catch (Exception e) {
+	        return new DefaultHttpClient();
+	    }
+	}
+
+	public static boolean isServiceRunning(Context context) {
+	    ActivityManager manager = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
+	    for (RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+	        if (CybService.class.getName().equals(service.service.getClassName())) {
+	            return true;
+	        }
+	    }
+	    return false;
+	    
 	}
 
 }

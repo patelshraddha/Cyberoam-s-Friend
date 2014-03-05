@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="#ffffff"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3D003D"
     android:orientation="vertical"
     android:weightSum="100" >
 
@@ -10,42 +10,58 @@
         android:id="@+id/userid"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="52dp"
+        android:background="#ffffff"
         android:gravity="center"
         android:hint="@string/useridinput"
-        android:textSize="15sp" />
+        android:textSize="20sp"
+        android:layout_weight="20" />
 
     <EditText
         android:id="@+id/userpassword"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        android:layout_marginTop="52dp"
+        android:background="#ffffff"
         android:gravity="center"
         android:hint="@string/userpassword"
         android:inputType="textPassword"
-        android:textSize="15sp" />
+        android:textSize="20sp"
+        android:layout_weight="20" >
+
+        <requestFocus />
+    </EditText>
 
     <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:background="#3D003D"
         android:orientation="horizontal"
-        android:weightSum="100" >
+        android:layout_gravity="bottom"
+        android:weightSum="100"
+        android:layout_weight="20" >
 
         <Button
             android:id="@+id/save"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="50"
-            android:text="@string/save" />
+            android:text="@string/save"
+            android:textColor="#ffffff" />
 
         <Button
             android:id="@+id/cancel"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:layout_weight="50"
-            android:text="@string/cancel" />
+            android:text="@string/cancel"
+            android:textColor="#ffffff" />
     </LinearLayout>
 
 </LinearLayout>

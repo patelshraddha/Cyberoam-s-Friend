@@ -28,7 +28,7 @@ public class InformGui {
 	private static NotificationCompat.Builder notiBuilder = null;
 	public static Notification updateGuiStatus(Const key, Context context) {
 		
-		if(key.equals(loggedIn))
+		if(key.equals(loggedIn)||key.equals(loggedOut))
 			currMsg = getMessage(key)+Vars.loginId;
 		else
 			currMsg = getMessage(key);

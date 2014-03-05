@@ -9,11 +9,10 @@ public class CybApp extends Application {
 	public void onCreate() {
 		super.onCreate();
 		
-		if (Control.isServiceRunning(this) == false) {
+		if (Methods.isServiceRunning(this) == false) {
 			Thread thd = new Thread(){
 				@Override
 				public void run() {
-					// TODO Auto-generated method stub
 					super.run();
 					Intent startServiceIntent = new Intent(getApplicationContext(),com.netsavvies.cyberoam.backend.CybService.class);
 					startService(startServiceIntent);
@@ -27,7 +26,7 @@ public class CybApp extends Application {
 	@Override
 	public void onLowMemory() {
 		super.onLowMemory();
-		if (Control.isServiceRunning(this) == false) {
+		if (Methods.isServiceRunning(this) == false) {
 			Thread thd = new Thread(){
 				@Override
 				public void run() {
@@ -44,7 +43,7 @@ public class CybApp extends Application {
 	@Override
 	public void onTrimMemory(int level) {
 		super.onTrimMemory(level);
-		if (Control.isServiceRunning(this) == false) {
+		if (Methods.isServiceRunning(this) == false) {
 			Thread thd = new Thread(){
 				@Override
 				public void run() {

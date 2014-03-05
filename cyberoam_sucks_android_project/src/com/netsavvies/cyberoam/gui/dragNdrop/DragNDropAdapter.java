@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -183,6 +184,7 @@ public final class DragNDropAdapter extends BaseAdapter implements DropListener 
 		final Dialog dialog = new Dialog(context);
 		dialog.setContentView(R.layout.changeuserdialog);
 		dialog.setTitle(R.string.change_password_dialog_title);
+		dialog.getWindow().setLayout(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT);
 		dialog.show();
 		final Button save = (Button) dialog.findViewById(R.id.save_button);
 		final Button cancel = (Button) dialog.findViewById(R.id.cancel_button);

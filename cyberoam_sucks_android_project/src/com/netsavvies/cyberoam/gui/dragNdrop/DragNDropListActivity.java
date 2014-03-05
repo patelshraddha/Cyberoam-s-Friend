@@ -9,10 +9,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Layout;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -22,7 +24,6 @@ import android.widget.Toast;
 
 import com.netsavvies.cyberoam.R;
 import com.netsavvies.cyberoam.backend.Const;
-import com.netsavvies.cyberoam.backend.Control;
 import com.netsavvies.cyberoam.backend.DatabaseHandler;
 import com.netsavvies.cyberoam.backend.Methods;
 import com.netsavvies.cyberoam.backend.UserDetails;
@@ -33,6 +34,8 @@ public class DragNDropListActivity extends ListActivity {
 	private ArrayList<String> content;
 	private ArrayList<Boolean> checkboxcontent;
 	private DragNDropAdapter adapter;
+	private int windowwidth;
+	private int windowheight;
     static boolean change;
 	
 	@Override
@@ -43,6 +46,8 @@ public class DragNDropListActivity extends ListActivity {
 		content = new ArrayList<String>();
 		checkboxcontent = new ArrayList<Boolean>();
 		construct();
+		windowwidth = getWindowManager().getDefaultDisplay().getWidth();
+		windowheight = getWindowManager().getDefaultDisplay().getHeight();
 		adapter = new DragNDropAdapter(this, new int[] { R.layout.dragitem },
 				new int[] { R.id.TextView01 }, new int[] { R.id.checkBox },
 				new int[] { R.id.deleteuser }, content, checkboxcontent);
@@ -164,6 +169,7 @@ public class DragNDropListActivity extends ListActivity {
 		final Dialog dialog = new Dialog(context);
 		dialog.setContentView(R.layout.adduserdialog);
 		dialog.setTitle("Add Another User");
+		dialog.getWindow().setLayout(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		dialog.show();
 		final Button save = (Button) dialog.findViewById(R.id.save);
 		final Button cancel = (Button) dialog.findViewById(R.id.cancel);

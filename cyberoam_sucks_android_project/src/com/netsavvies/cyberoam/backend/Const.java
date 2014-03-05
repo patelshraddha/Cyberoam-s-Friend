@@ -57,7 +57,7 @@ public enum Const {
 		reLogin ,
 		wrongIdPwd,
 	    loggedIn,
-	
+	    loggedOut,
 	//receivers
 	    
 	    

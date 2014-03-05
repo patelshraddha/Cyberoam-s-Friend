@@ -19,14 +19,14 @@ import android.view.Menu;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.netsavvies.cyberoam.R;
-import com.netsavvies.cyberoam.backend.Control;
+import com.netsavvies.cyberoam.backend.Methods;
 
 public class LoginActivity extends Activity {
 
 	private String url;
 	private TextView display;
-	private final String loginid = "200901031";
-	private final String loginpassword = "divya";
+	private final String loginid = "201101124";
+	private final String loginpassword = "28101991";
 	private final String loginmode = "191";
 	private HttpResponse response;
 	BroadcastReceiver reg;
@@ -35,8 +35,8 @@ public class LoginActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		setContentView(R.layout.activity_login);
-		display=(TextView)findViewById(R.id.textview);
+		//setContentView(R.layout.activity_login);
+		//display=(TextView)findViewById(R.id.textview);
 
 		int percentage = 0;
 
@@ -68,7 +68,7 @@ public class LoginActivity extends Activity {
 		
 	     */
 		
-		if(Control.isServiceRunning(this)==false)
+		if(Methods.isServiceRunning(this)==false)
 		{
 		Toast.makeText(this,"HERE",Toast.LENGTH_SHORT).show();
 		Intent startServiceIntent = new Intent(this, com.netsavvies.cyberoam.backend.CybService.class);

@@ -322,7 +322,7 @@ public class CybService extends Service {
 	}
 
 	private void dispatch(Const level, Const command) {
-		Log.wtf("dispatch", level.name() + " " + command.name());
+		//Log.wtf("dispatch", level.name() + " " + command.name());
 		Toast.makeText(getApplicationContext(), level + "   " + command,Toast.LENGTH_SHORT).show();
 		switch (level) {
 		case top:
@@ -369,7 +369,11 @@ public class CybService extends Service {
 			switch (command) {
 			case stop:
 				receiver(wifi, false);
+				if(get(isDisabled)==true)
+				handleGuiStatus(loggedOut);
+				else
 				handleGuiStatus(stop);
+				
 			case wifiDisconnected:
 				// InformGui.updateGuiStatus(wifiDisconnected, true);
 			case wifiConnected:
@@ -381,7 +385,7 @@ public class CybService extends Service {
 					receiver(wifi, true);
 					dispatch(net, command);
 				} else {
-					Toast.makeText(this,"wifidisconnected",Toast.LENGTH_SHORT).show();
+					//Toast.makeText(this,"wifidisconnected",Toast.LENGTH_SHORT).show();
 					handleGuiStatus(wifiDisconnected);
 					receiver(wifi, true);
 				}
@@ -415,6 +419,7 @@ public class CybService extends Service {
 			case strChange:
 			case reLogin:
 			case cybCheck:
+			case loggedOut:
 				dispatch(str, command);
 				break;
 			case wifiDisconnected:
@@ -483,6 +488,7 @@ public class CybService extends Service {
 				return;
 			case wifiConnected:
 			case start:
+			case loggedOut:
 				if (check(str)) {
 					set(str, true);
 					receiver(str, true);
@@ -553,7 +559,7 @@ public class CybService extends Service {
 					timer(c, false);
 					dispatch(l, command);
 					break;
-
+				case loggedOut:
 				case noNet:
 				case cybCheck:
 				case wifiConnected:
@@ -601,7 +607,14 @@ public class CybService extends Service {
 					set(l, false);
 				}
 				break;
-
+			case loggedOut:
+				if (get(l)) {
+					Methods.attemptLogout(getApplicationContext(),
+							Vars.loginId, Vars.password);
+					handleGuiStatus(loggedOut);
+					set(l, false);
+				}
+				break;
 			case notLoggedIn:
 				set(l, false);
 			case highSTR:
@@ -680,6 +693,8 @@ public class CybService extends Service {
         //TODO check this
 		super.onCreate();
 		registerReceiver(backendReceiver,new IntentFilter(restart.toString()));
+		registerReceiver(backendReceiver,new IntentFilter(loggedOut.toString()));
+		registerReceiver(backendReceiver,new IntentFilter(enable.toString()));
 	}
 
 	@Override
@@ -725,7 +740,7 @@ public class CybService extends Service {
 		return super.onStartCommand(intent, flags, startId);
 	}
 
-	private void handleGuiStatus(Const key){
+	public void handleGuiStatus(Const key){
 		startForeground(notiId,InformGui.updateGuiStatus(key,this));
 		Methods.sendBroadcast(updateGui.toString(),this); 
 	}
@@ -738,7 +753,15 @@ public class CybService extends Service {
 				case restart :  
 					dispatch(top,restart);
 					break;
+				case loggedOut:
+					
+					dispatch(top,disable);
+					break;
+				case enable:
+					dispatch (top,enable);
+					break;
 				default:
+					break;
 			}
 		}
 	};
