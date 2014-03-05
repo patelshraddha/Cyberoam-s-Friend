@@ -1,0 +1,3 @@
+1) Notepad++ -> View -> User Defined Language -> Import myLanguage.xml
+2) Open states.cyb in notepad++
+3) if still doesn't highlight, Language -> myLanguage

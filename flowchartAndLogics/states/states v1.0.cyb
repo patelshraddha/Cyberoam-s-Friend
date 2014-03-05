@@ -1,0 +1,132 @@
+Some tactics: 
+1) L+, LA+ and timer(L+) only if C+. IE C- => L-
+1.1) L+ => C+ but inverse may not be true
+
+2) NET+ && L+ => C+
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+setState(L,arg)
+timers(L-)
+{+
+	set(L+)
+	timers(L+ 2hrs)
+}+
+{-
+	set(L-)
+	switch(arg)
+	{
+		maxLoginLimit:
+			timers(L+ 30sec)
+		others (clientLess,lowStr,noCyb,invalidIdPwd, no Id Pwd):
+			do nothing
+	}
+}-
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+setState(C,arg) // TODO (unsure, as we have never tried to do setState(C+) when L_P=true ) : If already "C_P" (may be L_P) = true, do not try for L+
+timers(C-)
+{+
+	set(C+)
+	try(check(STR) && LA+)
+	{+
+		setState(L+)
+	}+
+	{-
+		find(reason)  // reasons:  lowSTR, maxLogin,clientless,invalid usr pwd, no Id Pwd
+		if(reason!=lowSTR) // we do this from setState(STR)
+			setState(L-,reason)
+	}-
+}+
+{-
+	set(C-)
+	setState(L-,noCyb) // assumption: no cyberoam server, no login. It means that if we go away from wifi, we will surely logout before the network (thus ,cyberoam server) becomes unavailble. TODO: Detect an absrupt disconnection from cyb server using the value L_P. Notify user "to be nearer to wifi" in order to "logout".
+	switch(arg)
+	{	
+		// noInternet: // assumption: the reason is unavailibility of cyberoam server
+		//	timers(C+ 30sec)
+		notReachable:
+			timers(C+ 30sec)
+		others(noWifi,server doesn't exist at all(wrong address)):
+			do nothing
+	}
+}-
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+setState(STR,arg) // this is not just fr STR, as C and L are controlled by it. We are calling it everytime we want to login from the beginning
+{+ {-
+	check(C_C && arg==yesWifi)
+	{+
+		if(L_P) // tactic: L_P true => C_P true, so not checking for C_P
+		{+
+			if(STR)
+			{+
+				do nothing
+			}+
+			{-
+				try(LA-) // don't know what could go wrong from this point
+				setState(L-,lowSTR)
+			}-
+		}+
+		{-
+			setState(C+) // login will be done in setState(C+)
+		}-
+	}+
+	{-
+		find(reason) // noWifi,server doesn't exist at all(wrong address), notReachable
+		setState(C-,reason)
+	}-
+
+}- }+
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+setState(NET,arg)
+timers(NET-)
+{+
+	set(NET+)
+	timers(NET+)
+	check(L_P)
+	{+
+		do nothing
+	}+
+	{-
+		// TODO: set a boolean that will prevent further C_C, L_P checkings
+		check(C_C)
+		{+
+			// some one has already logged in (a single ip is shared using NAT)
+		}+
+		{-
+			// cyberoam server doesn't exist || wrong address. but net is active =>cyberless net
+			
+		}-
+	}-
+	
+}+
+{-
+	set(NET-)
+	switch()
+	{	
+		noWIfi:
+			do nothing
+		cybPage(=> C_C = true):
+			// MAJOR TODO: cyb page may be change with versions. Should work with all the versions otherwise would go totally wrong
+			// logged out somehow, login again - setState(L-,noReason) and if(STR) userState(STR+)
+			check(L_P) setState(L-,noReason)
+			setState(check(STR),yesWifi) //it will handle C and L	
+			timers(NET+)
+			
+		others(no data returned, time out, C_C = false as no cybPage):
+			check(L_P)
+			{+
+				// Logged in but still net is not available. (Net not available to even the cyberoam server)
+				timers(NET+)
+			}+
+			{-
+				only reason to be here: cyberoam server is not available
+				setState(check(STR),yesWifi) //it will handle C and L
+				timers(NET+)
+			}-
+	}
+}-
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------
+// TODO: Wifi logic , timers logic - have to give proper attention, as they have to assess and modify every toggle without any hierarchy  as per the situation

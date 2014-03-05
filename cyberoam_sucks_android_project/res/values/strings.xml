@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Cyberoam sucks!</string>
+    <string name="action_settings">Add another user!!</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="useridinput">Enter the user id</string>
+    <string name="userpassword">Enter the password</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete_settings">Delete all users</string>
+    <string name="change_password_dialog_title">Change password</string>
+    <string name="change_user_prefrences">Change the user prefrences</string>
+    <string name="title_activity_main">MainActivity</string>
+
+</resources>
